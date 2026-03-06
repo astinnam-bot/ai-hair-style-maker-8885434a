@@ -30,12 +30,45 @@ serve(async (req) => {
 
     const images: string[] = [];
     const timestamp = Date.now();
+    let referenceImageUrl: string | null = null;
+
+    const angleDescriptions = [
+      "front view portrait",
+      "45 degree angle side view",
+      "complete side profile view",
+      "back view long shot showing full hairstyle from behind",
+    ];
 
     for (let i = 0; i < Math.min(count, 4); i++) {
-      const currentPrompt = i === 0 ? prompt :
-        i === 1 ? prompt.replace("front view", "45 degree angle side view") :
-        i === 2 ? prompt.replace("front view", "complete side profile view") :
-        prompt.replace("front view", "back view long shot showing full hairstyle from behind");
+      let messages: any[];
+
+      if (i === 0 || !referenceImageUrl) {
+        // First image: generate from scratch
+        const currentPrompt = prompt;
+        messages = [
+          {
+            role: "user",
+            content: `Generate a photorealistic hair model image: ${currentPrompt}. The image should look like a professional salon hair catalog photo with studio lighting and clean background.`,
+          },
+        ];
+      } else {
+        // Subsequent images: use first image as reference for consistency
+        messages = [
+          {
+            role: "user",
+            content: [
+              {
+                type: "image_url",
+                image_url: { url: referenceImageUrl },
+              },
+              {
+                type: "text",
+                text: `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. Keep the same studio lighting and clean background. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes to ${angleDescriptions[i]}.`,
+              },
+            ],
+          },
+        ];
+      }
 
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
@@ -45,12 +78,7 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           model: "google/gemini-2.5-flash-image",
-          messages: [
-            {
-              role: "user",
-              content: `Generate a photorealistic hair model image: ${currentPrompt}. The image should look like a professional salon hair catalog photo with studio lighting and clean background.`,
-            },
-          ],
+          messages,
           modalities: ["image", "text"],
         }),
       });
