@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
 import { ChevronLeft, Sparkles, Loader2, Lock, Download } from 'lucide-react';
 import { generateHairImage } from '@/lib/generateImage';
-import { downloadImage } from '@/lib/downloadImage';
+import { downloadImageWithWatermark } from '@/lib/downloadImage';
 import { useToast } from '@/hooks/use-toast';
 
 const GeneratePage = () => {
