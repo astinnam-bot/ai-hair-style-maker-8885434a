@@ -80,6 +80,18 @@ const GeneratePage = () => {
               <p className="text-muted-foreground text-sm font-medium">AI 모델 이미지가 여기에 표시됩니다</p>
             </div>
 
+            {/* Custom input */}
+            <div className="mb-4">
+              <label className="text-[13px] text-muted-foreground mb-1.5 block">스타일 직접 입력 (선택사항)</label>
+              <input
+                type="text"
+                value={customInput}
+                onChange={(e) => setCustomInput(e.target.value.slice(0, 80))}
+                placeholder={categoryPlaceholder[style.category] || '추가 스타일 키워드 입력'}
+                className="w-full bg-secondary text-foreground rounded-xl px-4 py-3 text-[14px] placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+              />
+            </div>
+
             {/* Generate Button */}
             <button
               onClick={handleGenerate}
