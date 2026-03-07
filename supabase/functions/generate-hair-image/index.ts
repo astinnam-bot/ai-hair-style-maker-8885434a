@@ -6,6 +6,36 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Seasonal clothing based on current month
+function getSeasonalClothing(isMale: boolean): string {
+  const month = new Date().getMonth() + 1; // 1-12
+  if (isMale) {
+    if (month >= 3 && month <= 5) {
+      // Spring
+      return pickRandom(["light linen shirt", "thin cotton sweater over a collared shirt", "casual spring jacket with a t-shirt", "knit polo shirt", "denim jacket over a henley"]);
+    } else if (month >= 6 && month <= 8) {
+      // Summer
+      return pickRandom(["crisp white short-sleeve shirt", "breathable linen camp collar shirt", "casual cotton polo", "lightweight henley t-shirt", "relaxed fit crew neck tee"]);
+    } else if (month >= 9 && month <= 11) {
+      // Autumn
+      return pickRandom(["wool crew-neck sweater", "layered flannel shirt", "corduroy jacket over a turtleneck", "knit cardigan over a shirt", "suede bomber jacket with a t-shirt"]);
+    } else {
+      // Winter
+      return pickRandom(["chunky knit turtleneck sweater", "wool overcoat over a button-up shirt", "cashmere crew-neck sweater", "padded vest over a hoodie", "heavy knit cable sweater"]);
+    }
+  } else {
+    if (month >= 3 && month <= 5) {
+      return pickRandom(["floral blouse", "light cardigan over a camisole", "pastel knit top", "denim jacket over a spring dress", "cotton wrap blouse"]);
+    } else if (month >= 6 && month <= 8) {
+      return pickRandom(["off-shoulder blouse", "lightweight linen top", "airy cotton camisole with a light cardigan", "sleeveless knit top", "breezy floral top"]);
+    } else if (month >= 9 && month <= 11) {
+      return pickRandom(["cozy knit sweater", "trench coat over a blouse", "turtleneck with a blazer", "chunky cardigan", "suede jacket over a fitted top"]);
+    } else {
+      return pickRandom(["cashmere turtleneck", "wool coat over a knit dress", "faux fur collar coat over a blouse", "thick cable-knit sweater", "padded jacket with a scarf"]);
+    }
+  }
+}
+
 // Variety traits to randomize model appearance — all in English for the AI model
 const modelTraits = {
   male: {
@@ -39,7 +69,8 @@ function buildVarietyPrompt(basePrompt: string): string {
   const build = pickRandom(traits.builds);
   const vibe = pickRandom(traits.vibes);
   const uniqueId = Math.random().toString(36).substring(2, 8);
-  return `${basePrompt}. IMPORTANT: Generate a UNIQUE and DISTINCTIVE person, NOT a generic model. The model is a Korean ${isMale ? "man" : "woman"} in their ${age}, with a ${face}, ${skin}, ${build}, and a ${vibe}. The person MUST be wearing appropriate clothing (e.g. a casual top, shirt, blouse, or sweater). NEVER generate a bare-shouldered or unclothed model. This person has unique individual features that make them look like a real specific person (model ID: ${uniqueId}). Do NOT reuse the same face from previous generations.`;
+  const clothing = getSeasonalClothing(isMale);
+  return `${basePrompt}. IMPORTANT: Generate a UNIQUE and DISTINCTIVE person, NOT a generic model. The model is a Korean ${isMale ? "man" : "woman"} in their ${age}, with a ${face}, ${skin}, ${build}, and a ${vibe}. The person MUST be wearing a ${clothing}. NEVER generate a bare-shouldered or unclothed model. This person has unique individual features that make them look like a real specific person (model ID: ${uniqueId}). Do NOT reuse the same face from previous generations.`;
 }
 
 function extractImageUrl(choice: any): string | null {
