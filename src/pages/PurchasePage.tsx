@@ -125,7 +125,7 @@ const PurchasePage = () => {
             )}
 
             <div className="bg-card rounded-2xl border border-border p-5 mb-5">
-              <p className="text-[15px] font-bold text-foreground mb-4">포함된 이미지 4장</p>
+              <p className="text-[15px] font-bold text-foreground mb-4">포함된 이미지 5장</p>
               <div className="flex flex-col gap-3">
                 {shotLabels.map((shot, i) => (
                   <div key={i} className="flex items-start gap-3">
@@ -181,7 +181,7 @@ const PurchasePage = () => {
                 <span className="text-[24px] font-bold text-foreground">₩5,500</span>
               </div>
               <p className="text-[12px] text-muted-foreground mt-2">
-                워터마크 없는 고화질 이미지 4장이 제공됩니다
+                워터마크 없는 고화질 이미지 5장이 제공됩니다 (상세 4장 + 병합 1장)
               </p>
             </div>
 
@@ -193,7 +193,7 @@ const PurchasePage = () => {
               {isProcessing ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  이미지 생성 중... (4장)
+                  이미지 생성 중... (5장)
                 </>
               ) : (
                 <>
