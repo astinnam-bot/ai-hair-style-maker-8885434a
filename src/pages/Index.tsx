@@ -47,6 +47,9 @@ const Index = () => {
         <div className="mt-8 bg-secondary rounded-2xl p-5">
           <p className="text-sm font-semibold text-foreground mb-1">✨ AI가 생성하는 헤어 모델</p>
           <p className="text-[13px] text-muted-foreground leading-relaxed">
+            전문 헤어디자이너 시술샘플 이미지 저작권 소유 상용가능한 나만의 모델 만들기
+          </p>
+          <p className="text-[13px] text-muted-foreground leading-relaxed mt-2">
             원하는 헤어스타일을 선택하면 AI가 해당 스타일의 헤어 모델 이미지를 생성합니다.
             미리보기 1장은 무료, 상세 4컷은 결제 후 확인할 수 있습니다.
           </p>
