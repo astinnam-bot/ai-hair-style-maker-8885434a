@@ -12,7 +12,14 @@ const GeneratePage = () => {
   const style = allStyles.find(s => s.id === styleId);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [customInput, setCustomInput] = useState('');
   const { toast } = useToast();
+
+  const categoryPlaceholder: Record<string, string> = {
+    cut: '예: 외국인 스타일, 자연스러운 볼륨',
+    perm: '예: 쉐도우 애즈 펌, 볼륨감 강하게',
+    color: '예: 뿌리 자연스럽게, 하이톤',
+  };
 
   if (!style) {
     return (
