@@ -32,7 +32,10 @@ const GeneratePage = () => {
   const handleGenerate = async () => {
     setIsGenerating(true);
     try {
-      const images = await generateHairImage(style.prompt, 1);
+      const finalPrompt = customInput.trim()
+        ? `${style.prompt}, ${customInput.trim()}`
+        : style.prompt;
+      const images = await generateHairImage(finalPrompt, 1);
       if (images.length > 0) {
         setGeneratedImage(images[0]);
       }
