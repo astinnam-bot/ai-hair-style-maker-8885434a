@@ -13,6 +13,11 @@ const shotLabels = [
   { label: '후면 롱샷', description: '뒷모습에서 본 전체 스타일' },
 ];
 
+const allShotLabels = [
+  ...shotLabels,
+  { label: '4컷 병합 이미지', description: '4가지 각도를 한 장에 담은 이미지' },
+];
+
 async function createMergedImage(images: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
     const imgElements: HTMLImageElement[] = [];
