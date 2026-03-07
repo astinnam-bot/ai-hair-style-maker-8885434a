@@ -16,7 +16,7 @@ const modelTraits = {
     vibes: ["calm relaxed expression", "confident sharp gaze", "friendly warm smile", "serious editorial expression", "playful youthful look"],
   },
   female: {
-    ages: ["early 20s", "mid 20s", "late 20s", "early 30s", "mid 30s"],
+    ages: ["early 20s", "mid 20s", "late 20s", "early 30s", "mid 30s", "late 30s"],
     faces: ["round soft face", "oval face shape", "heart-shaped face", "V-line jawline", "small delicate face with high cheekbones"],
     skins: ["porcelain fair skin", "light natural skin", "warm honey skin tone", "slightly tanned glowing skin"],
     builds: ["slim petite build", "average build", "tall slender build"],
