@@ -13,6 +13,38 @@ const shotLabels = [
   { label: '후면 롱샷', description: '뒷모습에서 본 전체 스타일' },
 ];
 
+async function createMergedImage(images: string[]): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const imgElements: HTMLImageElement[] = [];
+    let loaded = 0;
+    images.forEach((src, i) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        loaded++;
+        if (loaded === images.length) {
+          // 2x2 grid
+          const cellW = imgElements[0].naturalWidth;
+          const cellH = imgElements[0].naturalHeight;
+          const canvas = document.createElement('canvas');
+          canvas.width = cellW * 2;
+          canvas.height = cellH * 2;
+          const ctx = canvas.getContext('2d')!;
+          imgElements.forEach((el, idx) => {
+            const col = idx % 2;
+            const row = Math.floor(idx / 2);
+            ctx.drawImage(el, col * cellW, row * cellH, cellW, cellH);
+          });
+          resolve(canvas.toDataURL('image/jpeg', 0.92));
+        }
+      };
+      img.onerror = reject;
+      imgElements[i] = img;
+      img.src = src;
+    });
+  });
+}
+
 const PurchasePage = () => {
   const navigate = useNavigate();
   const { styleId } = useParams<{ styleId: string }>();
@@ -42,9 +74,15 @@ const PurchasePage = () => {
   const handlePurchase = async () => {
     setIsProcessing(true);
     try {
-      // Pass previewImage as reference so the 4 shots maintain the same person
       const images = await generateHairImage(style.prompt, 4, previewImage, copyrightText || undefined);
-      setGeneratedImages(images);
+      // Create merged 5th image from 4 shots
+      let mergedUrl = '';
+      try {
+        mergedUrl = await createMergedImage(images);
+      } catch (e) {
+        console.error('Merge failed', e);
+      }
+      setGeneratedImages(mergedUrl ? [...images, mergedUrl] : images);
       setIsPurchased(true);
     } catch (err: any) {
       toast({
