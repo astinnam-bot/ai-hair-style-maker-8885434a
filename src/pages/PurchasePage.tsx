@@ -127,7 +127,7 @@ const PurchasePage = () => {
           <div className="animate-fade-in">
             {/* Preview thumbnail if available */}
             {previewImage && (
-              <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden mb-5">
+              <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden mb-5 watermark">
                 <img src={previewImage} alt="미리보기" className="w-full h-full object-cover rounded-2xl" />
                 <p className="text-[12px] text-muted-foreground mt-2 text-center">이 모델의 상세 4컷이 생성됩니다</p>
               </div>
