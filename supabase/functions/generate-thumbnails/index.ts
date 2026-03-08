@@ -42,35 +42,46 @@ serve(async (req) => {
       }
     }
 
-    // Generate thumbnail image
-    const response = await fetch("https://api.cometapi.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${COMET_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gemini-2.5-flash-image",
-        modalities: ["image", "text"],
-        messages: [
-          {
-            role: "user",
-            content: `Generate a photorealistic hair model image: ${prompt}. The image should look like a professional salon hair catalog photo with studio lighting and clean background. Show only the head and upper shoulders, focused on the hairstyle.`,
-          },
-        ],
-      }),
-    });
+    // Generate thumbnail image with retry
+    let imageUrl: string | null = null;
+    const maxRetries = 3;
 
-    if (!response.ok) {
-      const errText = await response.text();
-      console.error("CometAPI error:", response.status, errText);
-      return new Response(JSON.stringify({ error: "이미지 생성 실패" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      const response = await fetch("https://api.cometapi.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${COMET_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gemini-2.5-flash-image",
+          modalities: ["image", "text"],
+          messages: [
+            {
+              role: "user",
+              content: `Generate a photorealistic hair model image: ${prompt}. The image should look like a professional salon hair catalog photo with studio lighting and clean background. Show only the head and upper shoulders, focused on the hairstyle.`,
+            },
+          ],
+        }),
       });
-    }
 
-    const data = await response.json();
-    const imageUrl = extractImageUrl(data.choices?.[0]?.message);
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error(`CometAPI error (attempt ${attempt + 1}):`, response.status, errText);
+        if (attempt === maxRetries - 1) {
+          return new Response(JSON.stringify({ error: "이미지 생성 실패" }), {
+            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        continue;
+      }
+
+      const data = await response.json();
+      imageUrl = extractImageUrl(data.choices?.[0]?.message);
+
+      if (imageUrl) break;
+      console.error(`No image extracted (attempt ${attempt + 1}):`, JSON.stringify(data).slice(0, 300));
+    }
 
     if (!imageUrl) {
       return new Response(JSON.stringify({ error: "이미지를 추출할 수 없습니다." }), {
