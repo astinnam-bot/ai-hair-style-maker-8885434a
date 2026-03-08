@@ -56,6 +56,7 @@ const PurchasePage = () => {
   const { styleId } = useParams<{ styleId: string }>();
   const location = useLocation();
   const previewImage = (location.state as any)?.previewImage as string | undefined;
+  const backgroundPrompt = (location.state as any)?.backgroundPrompt as string | undefined;
   const style = allStyles.find(s => s.id === styleId);
   const [isPurchased, setIsPurchased] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -80,7 +81,7 @@ const PurchasePage = () => {
   const handlePurchase = async () => {
     setIsProcessing(true);
     try {
-      const images = await generateHairImage(style.prompt, 4, previewImage, copyrightText || undefined);
+      const images = await generateHairImage(style.prompt, 4, previewImage, copyrightText || undefined, backgroundPrompt);
       // Create merged 5th image from 4 shots
       let mergedUrl = '';
       try {

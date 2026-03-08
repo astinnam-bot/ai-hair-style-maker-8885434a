@@ -53,8 +53,8 @@ const GeneratePage = () => {
       const ageDesc = ageMap[age] || 'in their 20s';
       const ethnicityDesc = ethnicityMap[ethnicity] || 'Korean';
       const bgOption = backgroundOptions.find(b => b.id === background)!;
-      const finalPrompt = `${style.prompt}, ${ethnicityDesc} person ${ageDesc}, ${bgOption.prompt}`;
-      const images = await generateHairImage(finalPrompt, 1);
+      const finalPrompt = `${style.prompt}, ${ethnicityDesc} person ${ageDesc}`;
+      const images = await generateHairImage(finalPrompt, 1, undefined, undefined, bgOption.prompt);
       if (images.length > 0) {
         setGeneratedImage(images[0]);
       }
@@ -193,7 +193,7 @@ const GeneratePage = () => {
 
             {/* Purchase CTA - pass preview image via state */}
             <button
-              onClick={() => navigate(`/purchase/${style.id}`, { state: { previewImage: generatedImage } })}
+              onClick={() => navigate(`/purchase/${style.id}`, { state: { previewImage: generatedImage, backgroundPrompt: backgroundOptions.find(b => b.id === background)!.prompt } })}
               className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
             >
               <Lock className="w-4 h-4" />
