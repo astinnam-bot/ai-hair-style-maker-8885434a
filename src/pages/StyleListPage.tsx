@@ -5,22 +5,6 @@ import { ChevronLeft, Sparkles, Loader2, ImagePlus, RefreshCw } from 'lucide-rea
 import { supabase } from '@/integrations/supabase/client';
 import KakaoShareButton from '@/components/KakaoShareButton';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-
-interface PromptModifier {
-  id: string;
-  label: string;
-  emoji: string;
-  promptSuffix: string;
-}
-
-const promptModifiers: PromptModifier[] = [
-  { id: 'age20s', label: '20대로 변경', emoji: '👤', promptSuffix: 'The model must be a young person in their early-to-mid 20s with youthful features.' },
-  { id: 'cafe', label: '카페 배경', emoji: '☕', promptSuffix: 'The background should be a cozy stylish Korean cafe interior with warm lighting, wooden furniture, and plants. NOT a studio background.' },
-  { id: 'sns', label: 'SNS 자연스러운 포즈', emoji: '📸', promptSuffix: 'The pose should be natural and casual like an Instagram selfie or SNS lifestyle photo, slightly candid looking, not stiff studio pose.' },
-  { id: 'stylish', label: '센스있는 의상', emoji: '👗', promptSuffix: 'The model should wear trendy, fashionable, stylish Korean street fashion outfit that looks magazine-worthy and coordinated.' },
-];
-
 const StyleListPage = () => {
   const navigate = useNavigate();
   const { gender, category } = useParams<{ gender: string; category: string }>();
@@ -34,7 +18,6 @@ const StyleListPage = () => {
   const [thumbnails, setThumbnails] = useState<Record<string, string>>({});
   const [generating, setGenerating] = useState<Record<string, boolean>>({});
   const [bulkGenerating, setBulkGenerating] = useState(false);
-  const [activeModifiers, setActiveModifiers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadExistingThumbnails();
@@ -55,28 +38,11 @@ const StyleListPage = () => {
     setThumbnails(thumbMap);
   };
 
-  const toggleModifier = (id: string) => {
-    setActiveModifiers(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const getModifiedPrompt = (basePrompt: string) => {
-    const suffixes = promptModifiers
-      .filter(m => activeModifiers.has(m.id))
-      .map(m => m.promptSuffix);
-    return suffixes.length > 0 ? `${basePrompt}. ${suffixes.join(' ')}` : basePrompt;
-  };
-
   const generateThumbnail = async (styleId: string, prompt: string, forceRegenerate = false) => {
     setGenerating(prev => ({ ...prev, [styleId]: true }));
     try {
-      const modifiedPrompt = getModifiedPrompt(prompt);
       const { data, error } = await supabase.functions.invoke('generate-thumbnails', {
-        body: { styleId, prompt: modifiedPrompt, forceRegenerate },
+        body: { styleId, prompt, forceRegenerate },
       });
       if (data?.url) {
         setThumbnails(prev => ({ ...prev, [styleId]: `${data.url}?t=${Date.now()}` }));
@@ -110,7 +76,6 @@ const StyleListPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
       <header className="px-5 pt-14 pb-4">
         <div className="flex items-center justify-between mb-4">
           <button
@@ -128,23 +93,6 @@ const StyleListPage = () => {
         <p className="text-muted-foreground text-[14px] mt-1">
           스타일을 선택하고 AI 모델을 생성하세요
         </p>
-
-        {/* Prompt Modifier Chips */}
-        <div className="flex flex-wrap gap-2 mt-4">
-          {promptModifiers.map(mod => (
-            <button
-              key={mod.id}
-              onClick={() => toggleModifier(mod.id)}
-              className={`px-3 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 border ${
-                activeModifiers.has(mod.id)
-                  ? 'bg-primary text-primary-foreground border-primary shadow-sm'
-                  : 'bg-secondary text-muted-foreground border-border hover:border-primary/50'
-              }`}
-            >
-              {mod.emoji} {mod.label}
-            </button>
-          ))}
-        </div>
 
         {/* Action Buttons */}
         <div className="flex gap-2 mt-3">
@@ -178,7 +126,6 @@ const StyleListPage = () => {
         </div>
       </header>
 
-      {/* Styles Grid */}
       <main className="flex-1 px-5 pb-10">
         <div className="grid grid-cols-2 gap-3">
           {styles.map((style, index) => (
