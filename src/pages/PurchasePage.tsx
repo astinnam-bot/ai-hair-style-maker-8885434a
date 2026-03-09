@@ -88,10 +88,21 @@ const PurchasePage = () => {
     }
   }, [searchParams]);
 
+  // Handle payment failure redirect
+  useEffect(() => {
+    if (searchParams.get('fail') === 'true') {
+      const errorMessage = searchParams.get('message');
+      toast({
+        title: '결제 실패',
+        description: errorMessage || '결제가 취소되었거나 실패했습니다.',
+        variant: 'destructive',
+      });
+    }
+  }, []);
+
   const confirmPaymentAndGenerate = async (paymentKey: string, orderId: string, amount: number) => {
     setIsProcessing(true);
     try {
-      // 1. Confirm payment via edge function
       const { data: confirmData, error: confirmError } = await supabase.functions.invoke('confirm-payment', {
         body: { paymentKey, orderId, amount },
       });
@@ -100,8 +111,6 @@ const PurchasePage = () => {
         throw new Error(confirmData?.error || confirmError?.message || '결제 승인에 실패했습니다.');
       }
 
-      // 2. Generate images after successful payment
-      // Retrieve saved state from sessionStorage
       const savedCopyright = sessionStorage.getItem('purchase_copyright') || undefined;
       const savedBgPrompt = sessionStorage.getItem('purchase_bgPrompt') || undefined;
       const savedPreviewImage = sessionStorage.getItem('purchase_previewImage') || undefined;
@@ -123,7 +132,6 @@ const PurchasePage = () => {
       setGeneratedImages(mergedUrl ? [...images, mergedUrl] : images);
       setIsPurchased(true);
 
-      // Clean up sessionStorage
       sessionStorage.removeItem('purchase_copyright');
       sessionStorage.removeItem('purchase_bgPrompt');
       sessionStorage.removeItem('purchase_previewImage');
