@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import JSZip from 'jszip';
 
 const PRICE = 9900;
-const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || '';
+const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || 'test_ck_DpexMgkW36xpvB2xeDgwrGbR5ozO';
 
 const shotLabels = [
   { label: '정면 기본 컷', description: '얼굴 정면에서 본 스타일' },
