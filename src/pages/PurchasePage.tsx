@@ -94,7 +94,7 @@ const PurchasePage = () => {
       const errorMessage = searchParams.get('message');
       toast({
         title: '결제 실패',
-        description: errorMessage || '결제가 취소되었거나 실패했습니다.',
+        description: errorMessage || '결제가 취소되었거나 실패했어요.',
         variant: 'destructive',
       });
     }
@@ -108,7 +108,7 @@ const PurchasePage = () => {
       });
 
       if (confirmError || confirmData?.error) {
-        throw new Error(confirmData?.error || confirmError?.message || '결제 승인에 실패했습니다.');
+        throw new Error(confirmData?.error || confirmError?.message || '결제 승인에 실패했어요.');
       }
 
       const savedCopyright = sessionStorage.getItem('purchase_copyright') || undefined;
@@ -138,7 +138,7 @@ const PurchasePage = () => {
     } catch (err: any) {
       toast({
         title: '결제 처리 실패',
-        description: err.message || '잠시 후 다시 시도해주세요.',
+        description: err.message || '잠시 후 다시 시도해 주세요.',
         variant: 'destructive',
       });
     } finally {
@@ -149,7 +149,7 @@ const PurchasePage = () => {
   if (!style) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">스타일을 찾을 수 없습니다.</p>
+        <p className="text-muted-foreground">스타일을 찾을 수 없어요.</p>
       </div>
     );
   }
@@ -158,7 +158,7 @@ const PurchasePage = () => {
     if (!TOSS_CLIENT_KEY) {
       toast({
         title: '결제 설정 필요',
-        description: '토스페이먼츠 클라이언트 키가 설정되지 않았습니다.',
+        description: '토스페이먼츠 클라이언트 키가 설정되지 않았어요.',
         variant: 'destructive',
       });
       return;
@@ -195,7 +195,7 @@ const PurchasePage = () => {
       if (err.code !== 'USER_CANCEL') {
         toast({
           title: '결제 오류',
-          description: err.message || '결제를 시작할 수 없습니다.',
+          description: err.message || '결제를 시작할 수 없어요.',
           variant: 'destructive',
         });
       }
@@ -203,8 +203,6 @@ const PurchasePage = () => {
       setIsPaymentLoading(false);
     }
   };
-
-
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -242,7 +240,7 @@ const PurchasePage = () => {
             <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
             <p className="text-[16px] font-bold text-foreground mb-2">결제 완료! 이미지 생성 중...</p>
             <p className="text-[14px] text-muted-foreground text-center">
-              고화질 상세 5장을 생성하고 있습니다.<br />잠시만 기다려주세요.
+              고화질 상세 5장을 생성하고 있어요.<br />잠시만 기다려 주세요.
             </p>
           </div>
         ) : !isPurchased ? (
@@ -250,7 +248,7 @@ const PurchasePage = () => {
             {previewImage && (
               <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden mb-5 watermark">
                 <img src={previewImage} alt="미리보기" className="w-full h-full object-cover rounded-2xl" />
-                <p className="text-[12px] text-muted-foreground mt-2 text-center">이 모델의 상세 4컷이 생성됩니다</p>
+                <p className="text-[12px] text-muted-foreground mt-2 text-center">이 모델의 상세 4컷이 생성돼요</p>
               </div>
             )}
 
@@ -274,7 +272,7 @@ const PurchasePage = () => {
             {/* Affiliation & Initials */}
             <div className="bg-card rounded-2xl border border-border p-5 mb-5">
               <p className="text-[15px] font-bold text-foreground mb-1">저작권 정보 <span className="text-muted-foreground font-normal text-[12px]">(선택사항)</span></p>
-              <p className="text-[12px] text-muted-foreground mb-4">입력하시면 이미지 하단에 저작권 문구가 표시됩니다.</p>
+              <p className="text-[12px] text-muted-foreground mb-4">입력하시면 이미지 하단에 저작권 문구가 표시돼요.</p>
               <div className="flex flex-col gap-3">
                 <div>
                   <label className="text-[13px] text-muted-foreground mb-1 block">소속</label>
@@ -311,11 +309,11 @@ const PurchasePage = () => {
                 <span className="text-[24px] font-bold text-foreground">₩9,900</span>
               </div>
               <p className="text-[12px] text-muted-foreground mt-2">
-                워터마크 없는 고화질 이미지 5장이 제공됩니다 (상세 4장 + 병합 1장)
+                워터마크 없는 고화질 이미지 5장이 제공돼요 (상세 4장 + 병합 1장)
               </p>
               <div className="flex items-center gap-2 mt-3">
                 <img src="https://static.toss.im/icons/png/4x/icon-toss-logo.png" alt="토스페이" className="h-5" />
-                <span className="text-[12px] text-muted-foreground">토스페이먼츠로 안전하게 결제됩니다</span>
+                <span className="text-[12px] text-muted-foreground">토스페이먼츠로 안전하게 결제돼요</span>
               </div>
             </div>
 
@@ -390,7 +388,7 @@ const PurchasePage = () => {
                   document.body.removeChild(a);
                   URL.revokeObjectURL(url);
                 } catch {
-                  toast({ title: "다운로드 실패", description: "잠시 후 다시 시도해주세요.", variant: "destructive" });
+                  toast({ title: "다운로드 실패", description: "잠시 후 다시 시도해 주세요.", variant: "destructive" });
                 }
               }}
               className="w-full mb-4 bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
@@ -400,10 +398,10 @@ const PurchasePage = () => {
             </button>
 
             <div className="bg-secondary rounded-2xl p-4">
-              <p className="text-[13px] text-foreground font-semibold mb-1">✅ 결제가 완료되었습니다</p>
+              <p className="text-[13px] text-foreground font-semibold mb-1">✅ 결제가 완료되었어요</p>
               <p className="text-[12px] text-muted-foreground">
-                {style.name} 스타일의 상세 5장이 생성되었습니다.
-                고화질 워터마크 없는 이미지를 확인하세요.
+                {style.name} 스타일의 상세 5장이 생성되었어요.
+                고화질 워터마크 없는 이미지를 확인해 보세요.
               </p>
             </div>
 

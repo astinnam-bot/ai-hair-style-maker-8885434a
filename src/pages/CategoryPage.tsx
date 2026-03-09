@@ -37,7 +37,7 @@ const CategoryPage = () => {
           {genderLabel} 스타일
         </h1>
         <p className="text-muted-foreground text-[15px] mt-1">
-          원하는 스타일 카테고리를 선택하세요
+          원하는 스타일 카테고리를 선택해 주세요
         </p>
       </header>
 

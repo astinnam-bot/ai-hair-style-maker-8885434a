@@ -37,11 +37,10 @@ const GeneratePage = () => {
     'foreign': 'Western/Caucasian',
   };
 
-
   if (!style) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">스타일을 찾을 수 없습니다.</p>
+        <p className="text-muted-foreground">스타일을 찾을 수 없어요.</p>
       </div>
     );
   }
@@ -61,7 +60,7 @@ const GeneratePage = () => {
     } catch (err: any) {
       toast({
         title: "이미지 생성 실패",
-        description: err.message || "잠시 후 다시 시도해주세요.",
+        description: err.message || "잠시 후 다시 시도해 주세요.",
         variant: "destructive",
       });
     } finally {
@@ -108,7 +107,7 @@ const GeneratePage = () => {
             {/* Preview placeholder */}
             <div className="w-full aspect-[3/4] rounded-2xl bg-secondary flex flex-col items-center justify-center mb-6">
               <Sparkles className="w-12 h-12 text-muted-foreground mb-3" />
-              <p className="text-muted-foreground text-sm font-medium">AI 모델 이미지가 여기에 표시됩니다</p>
+              <p className="text-muted-foreground text-sm font-medium">AI 모델 이미지가 여기에 표시돼요</p>
             </div>
 
             {/* Background Options */}
@@ -187,7 +186,7 @@ const GeneratePage = () => {
             {/* Info */}
             <div className="bg-secondary rounded-2xl p-4 mb-4">
               <p className="text-[13px] text-muted-foreground">
-                ⚠️ 미리보기 이미지에는 워터마크가 포함되어 있습니다.
+                ⚠️ 미리보기 이미지에는 워터마크가 포함되어 있어요.
               </p>
             </div>
 
@@ -197,7 +196,7 @@ const GeneratePage = () => {
               className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
             >
               <Lock className="w-4 h-4" />
-              상세 4컷 보기 · ₩5,500
+              상세 4컷 보기 · ₩9,900
             </button>
 
             <p className="text-center text-muted-foreground text-[12px] mt-3">
