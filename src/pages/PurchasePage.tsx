@@ -174,8 +174,8 @@ const PurchasePage = () => {
         amount: { currency: 'KRW', value: PRICE },
         orderId,
         orderName: `${style!.name} 상세 컷 5장`,
-        successUrl: currentUrl + `?paymentKey={paymentKey}&orderId={orderId}&amount=${PRICE}`,
-        failUrl: currentUrl + `?fail=true&message={message}`,
+        successUrl: currentUrl,
+        failUrl: currentUrl + `?fail=true`,
       });
     } catch (err: any) {
       if (err?.code !== 'USER_CANCEL') {
