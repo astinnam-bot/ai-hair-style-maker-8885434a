@@ -7,7 +7,7 @@ export async function generateHairImage(prompt: string, count: number = 1, refer
 
   if (error) {
     console.error("Edge function error:", error);
-    throw new Error(error.message || "이미지 생성에 실패했습니다.");
+    throw new Error(error.message || "이미지 생성에 실패했어요.");
   }
 
   if (data?.error) {

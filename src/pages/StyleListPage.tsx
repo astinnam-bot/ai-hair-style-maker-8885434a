@@ -100,7 +100,7 @@ const StyleListPage = () => {
           {genderLabel} · {catLabel}
         </h1>
         <p className="text-muted-foreground text-[14px] mt-1">
-          스타일을 선택하고 AI 모델을 생성하세요
+          스타일을 선택하고 AI 모델을 생성해 보세요
         </p>
       </header>
 
