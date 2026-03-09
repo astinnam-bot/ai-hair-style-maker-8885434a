@@ -322,7 +322,7 @@ const PurchasePage = () => {
               ) : (
                 <>
                   <CreditCard className="w-5 h-5" />
-                  ₩9,900 토스페이 결제하기
+                  ₩9,900 결재해요
                 </>
               )}
             </button>
