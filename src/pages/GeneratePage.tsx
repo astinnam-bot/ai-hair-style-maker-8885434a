@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
 import { ChevronLeft, Sparkles, Loader2, Home } from 'lucide-react';
 import { generateHairImage } from '@/lib/generateImage';
-import KakaoShareButton from '@/components/KakaoShareButton';
+
 import { useToast } from '@/hooks/use-toast';
 
 const GeneratePage = () => {
@@ -92,7 +92,7 @@ const GeneratePage = () => {
               <Home className="w-4 h-4" />
               첫화면으로
             </button>
-            <KakaoShareButton title={style.name} description="AI 헤어모델 생성" />
+            
           </div>
         </div>
         <h1 className="text-[24px] font-bold text-foreground">

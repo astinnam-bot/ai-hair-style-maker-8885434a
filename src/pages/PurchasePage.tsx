@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
 import { ChevronLeft, Check, CreditCard, Sparkles, Loader2, Download, Home } from 'lucide-react';
-import KakaoShareButton from '@/components/KakaoShareButton';
+
 import { generateHairImage } from '@/lib/generateImage';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -204,7 +204,7 @@ const PurchasePage = () => {
               <Home className="w-4 h-4" />
               첫화면으로
             </button>
-            <KakaoShareButton title={style?.name || '상세 컷 구매'} description="AI 헤어모델 상세 컷" />
+            
           </div>
         </div>
         <h1 className="text-[24px] font-bold text-foreground">

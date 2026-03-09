@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getStyles, categoryOptions, type Gender, type Category } from '@/data/hairStyles';
 import { ChevronLeft, Sparkles, Loader2, ImagePlus, RefreshCw, Home } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import KakaoShareButton from '@/components/KakaoShareButton';
+
 
 const StyleListPage = () => {
   const navigate = useNavigate();
@@ -93,7 +93,7 @@ const StyleListPage = () => {
               <Home className="w-4 h-4" />
               첫화면으로
             </button>
-            <KakaoShareButton title={`${genderLabel} · ${catLabel}`} description="AI 헤어모델 스타일 목록" />
+            
           </div>
         </div>
         <h1 className="text-[24px] font-bold text-foreground">
