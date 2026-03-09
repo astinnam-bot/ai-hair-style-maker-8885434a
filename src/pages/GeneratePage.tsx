@@ -3,7 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
 import { ChevronLeft, Sparkles, Loader2, Home } from 'lucide-react';
 import { generateHairImage } from '@/lib/generateImage';
-import KakaoShareButton from '@/components/KakaoShareButton';
+
 import { useToast } from '@/hooks/use-toast';
 
 const GeneratePage = () => {
