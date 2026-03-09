@@ -247,7 +247,8 @@ const PurchasePage = () => {
           <div className="animate-fade-in">
             <div className="bg-primary/10 rounded-2xl p-5 mb-5">
               <p className="text-[15px] font-bold text-foreground leading-relaxed">
-                미리보기로 제공해드린 사진이 마음에 드시면 결제버튼 눌러주세요!! 그러면 마음에 쏙 드는 5장의 사진을 제공해드려요!!
+                미리보기로 제공해드린 사진이 마음에 드시면 결제버튼 눌러주세요!!<br />
+                그러면 마음에 쏙 드는 5장의 사진을 제공해드려요!!
               </p>
             </div>
             {previewImage && (
