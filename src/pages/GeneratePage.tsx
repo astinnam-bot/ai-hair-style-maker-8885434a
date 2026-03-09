@@ -61,7 +61,7 @@ const GeneratePage = () => {
     } catch (err: any) {
       toast({
         title: "이미지 생성 실패",
-        description: err.message || "잠시 후 다시 시도해주세요.",
+        description: err.message || "잠시 후 다시 시도해 주세요.",
         variant: "destructive",
       });
     } finally {
@@ -108,7 +108,7 @@ const GeneratePage = () => {
             {/* Preview placeholder */}
             <div className="w-full aspect-[3/4] rounded-2xl bg-secondary flex flex-col items-center justify-center mb-6">
               <Sparkles className="w-12 h-12 text-muted-foreground mb-3" />
-              <p className="text-muted-foreground text-sm font-medium">AI 모델 이미지가 여기에 표시돼요</p>
+              <p className="text-muted-foreground text-sm font-medium">AI 모델 이미지가 여기에 표시돼요>
             </div>
 
             {/* Background Options */}
