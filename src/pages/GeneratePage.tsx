@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
-import { ChevronLeft, Sparkles, Loader2, Lock, Download, RefreshCw, Home } from 'lucide-react';
+import { ChevronLeft, Sparkles, Loader2, Home } from 'lucide-react';
 import { generateHairImage } from '@/lib/generateImage';
 import KakaoShareButton from '@/components/KakaoShareButton';
-import { downloadImageWithWatermark } from '@/lib/downloadImage';
 import { useToast } from '@/hooks/use-toast';
 
 const GeneratePage = () => {
@@ -15,7 +14,6 @@ const GeneratePage = () => {
   const ethnicity = searchParams.get('ethnicity') || 'korean';
   const style = allStyles.find(s => s.id === styleId);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [background, setBackground] = useState<'cafe' | 'hairshop' | 'sns'>('cafe');
   const { toast } = useToast();
 
@@ -47,7 +45,6 @@ const GeneratePage = () => {
 
   const handleGenerate = async () => {
     setIsGenerating(true);
-    setGeneratedImage(null);
     try {
       const ageDesc = ageMap[age] || 'in their 20s';
       const ethnicityDesc = ethnicityMap[ethnicity] || 'Korean';
@@ -55,7 +52,13 @@ const GeneratePage = () => {
       const finalPrompt = `${style.prompt}, ${ethnicityDesc} person ${ageDesc}`;
       const images = await generateHairImage(finalPrompt, 1, undefined, undefined, bgOption.prompt);
       if (images.length > 0) {
-        setGeneratedImage(images[0]);
+        navigate(`/purchase/${style.id}`, {
+          state: {
+            previewImage: images[0],
+            backgroundPrompt: bgOption.prompt,
+          },
+        });
+        return;
       }
     } catch (err: any) {
       toast({
@@ -72,7 +75,6 @@ const GeneratePage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
       <header className="px-5 pt-14 pb-4">
         <div className="flex items-center justify-between mb-4">
           <button
@@ -102,104 +104,44 @@ const GeneratePage = () => {
       </header>
 
       <main className="flex-1 px-5 pb-10">
-        {!generatedImage ? (
-          <div className="animate-fade-in">
-            {/* Background Options */}
-
-            {/* Background Options */}
-            <div className="mb-6">
-              <p className="text-sm font-semibold text-foreground mb-3">배경 선택</p>
-              <div className="flex gap-2">
-                {backgroundOptions.map(opt => (
-                  <button
-                    key={opt.id}
-                    onClick={() => setBackground(opt.id)}
-                    className={`flex-1 py-2.5 px-3 rounded-xl text-[13px] font-medium transition-all duration-200 border ${
-                      background === opt.id
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-secondary text-muted-foreground border-transparent hover:text-foreground'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
+        <div className="animate-fade-in">
+          <div className="mb-6">
+            <p className="text-sm font-semibold text-foreground mb-3">배경 선택</p>
+            <div className="flex gap-2">
+              {backgroundOptions.map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => setBackground(opt.id)}
+                  className={`flex-1 py-2.5 px-3 rounded-xl text-[13px] font-medium transition-all duration-200 border ${
+                    background === opt.id
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-secondary text-muted-foreground border-transparent hover:text-foreground'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
-
-            {/* Generate Button */}
-            <button
-              onClick={handleGenerate}
-              disabled={isGenerating}
-              className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  AI 모델 생성 중...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  AI 헤어모델 생성하기
-                </>
-              )}
-            </button>
           </div>
-        ) : (
-          <div className="animate-slide-up">
-            {/* Generated image with watermark */}
-            <div className="w-full aspect-[3/4] rounded-2xl relative overflow-hidden mb-4 watermark">
-              <img
-                src={generatedImage}
-                alt={style.name}
-                className="w-full h-full object-cover rounded-2xl"
-              />
-            </div>
 
-            {/* Action buttons */}
-            <div className="flex gap-2 mb-3">
-              <button
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="flex-1 bg-secondary text-foreground rounded-2xl py-3 text-[14px] font-semibold transition-all duration-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isGenerating ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="w-4 h-4" />
-                )}
-                다시 생성
-              </button>
-              <button
-                onClick={() => downloadImageWithWatermark(generatedImage, `${style.name}_preview.jpg`)}
-                className="flex-1 bg-secondary text-foreground rounded-2xl py-3 text-[14px] font-semibold transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
-              >
-                <Download className="w-4 h-4" />
-                이미지 저장
-              </button>
-            </div>
-
-            {/* Info */}
-            <div className="bg-secondary rounded-2xl p-4 mb-4">
-              <p className="text-[13px] text-muted-foreground">
-                ⚠️ 미리보기 이미지에는 워터마크가 포함되어 있어요.
-              </p>
-            </div>
-
-            {/* Purchase CTA - pass preview image via state */}
-            <button
-              onClick={() => navigate(`/purchase/${style.id}`, { state: { previewImage: generatedImage, backgroundPrompt: backgroundOptions.find(b => b.id === background)!.prompt } })}
-              className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              <Lock className="w-4 h-4" />
-              상세 4컷 보기
-            </button>
-
-            <p className="text-center text-muted-foreground text-[12px] mt-3">
-              정면 기본컷 · 45도 측면컷 · 완전 측면 · 후면 롱샷
-            </p>
-          </div>
-        )}
+          <button
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                AI 모델 생성 중...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5" />
+                AI 헤어모델 생성하기
+              </>
+            )}
+          </button>
+        </div>
       </main>
     </div>
   );
