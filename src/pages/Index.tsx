@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Scissors } from 'lucide-react';
 import sample4cut from '@/assets/sample-4cut.jpg';
 import sampleGrid from '@/assets/sample-grid.webp';
@@ -70,6 +70,12 @@ const Index = () => {
              미리보기 1장은 무료, 상세 4컷은 결제 후 확인할 수 있어요.
           </p>
         </div>
+
+        <footer className="mt-8 text-center">
+          <Link to="/term" className="text-xs text-muted-foreground/60 hover:text-muted-foreground underline transition-colors">
+            이용약관
+          </Link>
+        </footer>
       </main>
     </div>
   );
