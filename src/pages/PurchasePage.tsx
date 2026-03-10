@@ -6,7 +6,7 @@ import { ChevronLeft, Check, CreditCard, Sparkles, Loader2, Download, Home } fro
 import { generateHairImage } from '@/lib/generateImage';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import JSZip from 'jszip';
+
 
 const PRICE = 9900;
 const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || 'test_ck_DpexMgkW36xpvB2xeDgwrGbR5ozO';
@@ -360,49 +360,27 @@ const PurchasePage = () => {
             <button
               onClick={async () => {
                 try {
-                  const zip = new JSZip();
-                  await Promise.all(
-                    generatedImages.map(async (img, i) => {
-                      let blob: Blob;
-                      // data: URLs (merged image) can be fetched directly
-                      if (img.startsWith('data:')) {
-                        const res = await fetch(img);
-                        blob = await res.blob();
-                      } else {
-                        // For Supabase storage URLs, extract bucket path and use SDK
-                        const storagePrefix = '/storage/v1/object/public/';
-                        const idx = img.indexOf(storagePrefix);
-                        if (idx !== -1) {
-                          const fullPath = img.substring(idx + storagePrefix.length);
-                          const slashIdx = fullPath.indexOf('/');
-                          const bucket = fullPath.substring(0, slashIdx);
-                          const filePath = fullPath.substring(slashIdx + 1);
-                          const { data: fileData, error: dlError } = await supabase.storage
-                            .from(bucket)
-                            .download(filePath);
-                          if (dlError || !fileData) throw new Error(dlError?.message || '다운로드 실패');
-                          blob = fileData;
-                        } else {
-                          // fallback: direct fetch
-                          const res = await fetch(img, { mode: 'cors' });
-                          if (!res.ok) throw new Error('fetch failed');
-                          blob = await res.blob();
-                        }
-                      }
-                      const ext = blob.type.includes("png") ? "png" : "jpg";
-                      const label = i < 4 ? shotLabels[i].label : '4컷_병합';
-                      zip.file(`${style.name}_${label}.${ext}`, blob);
-                    })
-                  );
-                  const content = await zip.generateAsync({ type: "blob" });
-                  const url = URL.createObjectURL(content);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = `${style.name}_전체이미지.zip`;
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                  URL.revokeObjectURL(url);
+                  toast({ title: "ZIP 생성 중...", description: "서버에서 이미지를 압축하고 있어요." });
+                  
+                  const labels = [
+                    ...shotLabels.map(s => s.label),
+                    '4컷_병합',
+                  ];
+
+                  const { data, error } = await supabase.functions.invoke('create-zip', {
+                    body: {
+                      imageUrls: generatedImages,
+                      styleName: style.name,
+                      labels: generatedImages.map((_, i) => labels[i] || `image_${i}`),
+                    },
+                  });
+
+                  if (error || data?.error) {
+                    throw new Error(data?.error || error?.message || 'ZIP 생성 실패');
+                  }
+
+                  // Open the ZIP URL directly — works on all mobile browsers
+                  window.open(data.zipUrl, '_blank');
                 } catch (e: any) {
                   console.error('ZIP download error:', e);
                   toast({ title: "다운로드 실패", description: e?.message || "잠시 후 다시 시도해 주세요.", variant: "destructive" });
