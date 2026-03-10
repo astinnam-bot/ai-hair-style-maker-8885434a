@@ -22,7 +22,7 @@ const TermsPage = () => {
               <p><span className="text-foreground font-medium">대표자:</span> 이재우</p>
               <p><span className="text-foreground font-medium">사업자등록번호:</span> 360-81-00221</p>
               <p><span className="text-foreground font-medium">주소:</span> 서울시 강남구 영동대로 602, 6층 SG98호 (미켈란 107, 삼성동)</p>
-              <p><span className="text-foreground font-medium">연락처:</span> 070-4063-9222</p>
+              <p><span className="text-foreground font-medium">연락처:</span> 070-4063-9888</p>
               <p><span className="text-foreground font-medium">이메일:</span> aihairmuse@gmail.com</p>
             </div>
           </section>
