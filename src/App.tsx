@@ -9,6 +9,7 @@ import StyleListPage from "./pages/StyleListPage";
 import GeneratePage from "./pages/GeneratePage";
 import PurchasePage from "./pages/PurchasePage";
 import NotFound from "./pages/NotFound";
+import TermsPage from "./pages/TermsPage";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/styles/:gender/:category" element={<StyleListPage />} />
           <Route path="/generate/:styleId" element={<GeneratePage />} />
           <Route path="/purchase/:styleId" element={<PurchasePage />} />
+          <Route path="/term" element={<TermsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
