@@ -22,7 +22,7 @@ const TermsPage = () => {
               <p><span className="text-foreground font-medium">대표자:</span> 이재우</p>
               <p><span className="text-foreground font-medium">사업자등록번호:</span> 360-81-00221</p>
               <p><span className="text-foreground font-medium">주소:</span> 서울시 강남구 영동대로 602, 6층 SG98호 (미켈란 107, 삼성동)</p>
-              <p><span className="text-foreground font-medium">연락처:</span> 070-4063-9222</p>
+              <p><span className="text-foreground font-medium">연락처:</span> 070-4063-9888</p>
               <p><span className="text-foreground font-medium">이메일:</span> aihairmuse@gmail.com</p>
             </div>
           </section>
@@ -76,7 +76,7 @@ const TermsPage = () => {
             <p className="font-medium text-foreground mt-3">3. 환불 절차</p>
             <ul className="list-disc list-inside ml-2 space-y-1">
               <li>환불 요청은 결제일로부터 7일 이내에 해주세요.</li>
-              <li>이메일(aihairmuse@gmail.com) 또는 전화(070-4063-9222)로 환불 사유와 함께 문의해주세요.</li>
+              <li>이메일(aihairmuse@gmail.com) 또는 전화(070-4063-9888)로 환불 사유와 함께 문의해주세요.</li>
               <li>확인 후 3~5영업일 이내에 결제 수단으로 환불 처리됩니다.</li>
             </ul>
           </section>
@@ -128,7 +128,7 @@ const TermsPage = () => {
           <section className="border-t border-border pt-4">
             <h2 className="text-base font-semibold text-foreground mb-2">고객센터 안내</h2>
             <p>• 이메일: aihairmuse@gmail.com</p>
-            <p>• 전화: 070-4063-9222</p>
+            <p>• 전화: 070-4063-9888</p>
             <p>• 운영시간: 평일 10:00 ~ 18:00 (주말·공휴일 휴무)</p>
           </section>
 
