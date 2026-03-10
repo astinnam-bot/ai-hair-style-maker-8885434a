@@ -16,19 +16,19 @@ const TermsPage = () => {
         <div className="space-y-6 text-sm leading-relaxed text-muted-foreground">
           <section>
             <h2 className="text-base font-semibold text-foreground mb-2">제1조 (목적)</h2>
-            <p>이 약관은 "운세역전" 서비스(이하 "서비스")의 이용과 관련하여 서비스 제공자와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 해요.</p>
+            <p>이 약관은 "AI 헤어 스타일" 서비스(이하 "서비스")의 이용과 관련하여 서비스 제공자와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 해요.</p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-2">제2조 (서비스의 정의)</h2>
-            <p>① "서비스"란 성명학과 수비학을 기반으로 한 운세 리포트를 제공하는 엔터테인먼트 서비스를 의미해요.</p>
-            <p>② "리포트"란 이용자가 입력한 이름과 생년월일을 바탕으로 생성되는 디지털 콘텐츠를 의미해요.</p>
+            <p>① "서비스"란 헤어모델을 AI기반으로 생성하여 제공하는 엔터테인먼트 서비스를 의미해요.</p>
+            <p>② "리포트"란 이용자가 입력한 이름과 이니셜을 바탕으로 생성되는 디지털 콘텐츠를 의미해요.</p>
             <p>③ "이용자"란 본 약관에 동의하고 서비스를 이용하는 만 19세 이상의 개인을 의미해요.</p>
           </section>
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-2">제3조 (서비스 내용 및 제한)</h2>
-            <p>① 본 서비스는 오락 및 참고 목적으로만 제공돼요.</p>
+            <p>① 본 서비스는 AI모델생성 판매 목적으로만 제공돼요.</p>
             <p>② 리포트 내용은 전문적인 의학적, 법률적, 재정적 조언을 대체하지 않아요.</p>
             <p>③ 중요한 결정을 내리기 전에는 반드시 해당 분야의 전문가와 상담하세요.</p>
             <p>④ 본 서비스는 만 19세 이상 이용자만 이용할 수 있어요.</p>
@@ -50,7 +50,7 @@ const TermsPage = () => {
             </ul>
             <p className="font-medium text-foreground mt-3">2. 환불이 어려운 경우</p>
             <ul className="list-disc list-inside ml-2 space-y-1">
-              <li>리포트 내용을 이미 확인한 경우 (디지털 콘텐츠 특성상)</li>
+              <li>리포트 내용을 이미 다운로드한 경우 (디지털 콘텐츠 특성상)</li>
               <li>단순 변심에 의한 환불 요청</li>
               <li>이용자의 입력 오류로 인한 결과 불만족</li>
             </ul>
@@ -78,8 +78,8 @@ const TermsPage = () => {
 
           <section>
             <h2 className="text-base font-semibold text-foreground mb-2">제8조 (개인정보 보호)</h2>
-            <p>① 수집하는 정보: 이름(한글/한자), 생년월일</p>
-            <p>② 수집 목적: 운세 리포트 생성 및 서비스 제공</p>
+            <p>① 수집하는 정보: 이름(한글/한자), 이니셜</p>
+            <p>② 수집 목적: AI 헤어모델 생성 및 서비스 제공</p>
             <p>③ 보관 기간: 리포트 생성 후 30일간 보관 후 자동 삭제</p>
             <p>④ 수집된 개인정보는 제3자에게 제공하지 않아요.</p>
             <p>⑤ 이용자는 언제든지 고객센터를 통해 개인정보 삭제를 요청할 수 있어요.</p>
