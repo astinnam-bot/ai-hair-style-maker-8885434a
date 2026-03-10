@@ -9,6 +9,7 @@ import StyleListPage from "./pages/StyleListPage";
 import GeneratePage from "./pages/GeneratePage";
 import PurchasePage from "./pages/PurchasePage";
 import NotFound from "./pages/NotFound";
+import TermsPage from "./pages/TermsPage";
 
 const queryClient = new QueryClient();
 
