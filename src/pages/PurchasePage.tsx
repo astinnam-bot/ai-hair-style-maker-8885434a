@@ -348,48 +348,18 @@ const PurchasePage = () => {
               </div>
             </div>
 
-            {/* 뽑기권 상태 & 버튼 */}
-            <div className="bg-secondary rounded-2xl p-5 mb-5">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${hasTicket ? 'bg-primary' : 'bg-muted'}`}>
-                  <Ticket className={`w-5 h-5 ${hasTicket ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
-                </div>
-                <div>
-                  <p className="text-[14px] font-bold text-foreground">
-                    {hasTicket ? '🎫 뽑기권 1장 보유 중' : '뽑기권이 없어요'}
-                  </p>
-                  <p className="text-[12px] text-muted-foreground">
-                    {hasTicket ? '상세 이미지 생성 버튼을 눌러주세요!' : '뽑기권을 구매하면 상세 이미지를 생성할 수 있어요.'}
-                  </p>
-                </div>
-              </div>
+            {/* 뽑기권 구매 / 생성 */}
+            <div className="mb-5">
+              <TicketBanner />
             </div>
 
-            {hasTicket ? (
+            {hasTicket && (
               <button
                 onClick={handleGenerate}
-                className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 animate-fade-in"
               >
                 <Sparkles className="w-5 h-5" />
                 상세 이미지 생성하기
-              </button>
-            ) : (
-              <button
-                onClick={handleBuyTicket}
-                disabled={isPurchasing}
-                className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isPurchasing ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    구매 진행 중...
-                  </>
-                ) : (
-                  <>
-                    <Ticket className="w-5 h-5" />
-                    🎫 1회 뽑기권 구매하기
-                  </>
-                )}
               </button>
             )}
           </div>
