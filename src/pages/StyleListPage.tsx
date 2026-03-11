@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getStyles, categoryOptions, type Gender, type Category } from '@/data/hairStyles';
 import { ChevronLeft, Sparkles, Loader2, ImagePlus, RefreshCw, Home } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import TicketBanner from '@/components/TicketBanner';
 
 
 const StyleListPage = () => {
@@ -105,6 +106,9 @@ const StyleListPage = () => {
       </header>
 
       <main className="flex-1 px-5 pb-10">
+        <div className="mb-5">
+          <TicketBanner />
+        </div>
         <div className="grid grid-cols-2 gap-3">
           {styles.map((style, index) => (
             <button

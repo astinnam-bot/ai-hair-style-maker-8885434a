@@ -2,6 +2,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Scissors } from 'lucide-react';
 import sample4cut from '@/assets/sample-4cut.jpg';
 import sampleGrid from '@/assets/sample-grid.webp';
+import TicketBanner from '@/components/TicketBanner';
 
 
 const genderChoices = [
@@ -32,6 +33,9 @@ const Index = () => {
       </header>
 
       <main className="flex-1 px-5 pb-10">
+        <div className="mb-5">
+          <TicketBanner />
+        </div>
         <div className="grid grid-cols-2 gap-3">
           {genderChoices.map((opt) => (
             <button

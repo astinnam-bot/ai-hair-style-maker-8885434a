@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
 import { ChevronLeft, Sparkles, Loader2, Home } from 'lucide-react';
 import { generateHairImage } from '@/lib/generateImage';
+import TicketBanner from '@/components/TicketBanner';
 
 import { useToast } from '@/hooks/use-toast';
 
@@ -104,6 +105,9 @@ const GeneratePage = () => {
       </header>
 
       <main className="flex-1 px-5 pb-10">
+        <div className="mb-5">
+          <TicketBanner />
+        </div>
         <div className="animate-fade-in">
           <div className="mb-6">
             <p className="text-sm font-semibold text-foreground mb-3">배경 선택</p>

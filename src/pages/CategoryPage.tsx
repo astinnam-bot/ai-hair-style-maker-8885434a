@@ -1,6 +1,7 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { categoryOptions, type Gender } from '@/data/hairStyles';
 import { ChevronLeft, Home } from 'lucide-react';
+import TicketBanner from '@/components/TicketBanner';
 
 
 const CategoryPage = () => {
@@ -43,6 +44,9 @@ const CategoryPage = () => {
 
       {/* Categories */}
       <main className="flex-1 px-5 pb-10">
+        <div className="mb-5">
+          <TicketBanner />
+        </div>
         <div className="flex flex-col gap-3">
           {categoryOptions.map((cat, index) => (
             <button
