@@ -9,8 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTicket } from '@/contexts/TicketContext';
 import { supabase } from '@/integrations/supabase/client';
 import TicketBanner from '@/components/TicketBanner';
-
-const IAP_PRODUCT_SKU = import.meta.env.VITE_IAP_PRODUCT_SKU || 'ait.0000022278.5a3a62a1.67f4825513.3234914875';
+import { purchaseTicket } from '@/lib/iap';
 
 const shotLabels = [
   { label: '정면 기본 컷', description: '얼굴 정면에서 본 스타일' },
