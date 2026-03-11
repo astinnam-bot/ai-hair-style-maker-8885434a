@@ -207,8 +207,14 @@ const PurchasePage = () => {
           <div className="animate-slide-up">
             {generatedImages[4] && (
               <div className="mb-5 animate-fade-in">
-                <div className="w-full aspect-square rounded-2xl overflow-hidden mb-2">
+                <div
+                  className="w-full aspect-square rounded-2xl overflow-hidden mb-2 cursor-pointer active:scale-[0.98] transition-transform"
+                  onClick={() => downloadImage(generatedImages[4], `${style.name}_4컷_병합.jpg`)}
+                >
                   <img src={generatedImages[4]} alt="병합 이미지" className="w-full h-full object-cover rounded-2xl" />
+                  <div className="absolute inset-0 flex items-end justify-center pb-3 bg-gradient-to-t from-black/30 to-transparent rounded-2xl opacity-0 hover:opacity-100 transition-opacity">
+                    <span className="text-white text-[12px] font-semibold flex items-center gap-1"><Download className="w-3.5 h-3.5" /> 탭하여 저장</span>
+                  </div>
                 </div>
                 <p className="text-[13px] font-semibold text-foreground">4컷 병합 이미지</p>
                 <p className="text-[11px] text-muted-foreground">정면 · 45도 · 측면 · 후면 한눈에 보기</p>
