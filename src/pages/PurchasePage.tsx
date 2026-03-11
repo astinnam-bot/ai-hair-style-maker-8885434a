@@ -59,6 +59,7 @@ const PurchasePage = () => {
   const navigate = useNavigate();
   const { styleId } = useParams<{ styleId: string }>();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const previewImage = (location.state as any)?.previewImage as string | undefined;
   const backgroundPrompt = (location.state as any)?.backgroundPrompt as string | undefined;
   const style = allStyles.find(s => s.id === styleId);
@@ -70,21 +71,26 @@ const PurchasePage = () => {
   const [initials, setInitials] = useState('');
   const { toast } = useToast();
   const cleanupRef = useRef<(() => void) | null>(null);
+  const paymentProcessedRef = useRef(false);
 
   const currentYear = new Date().getFullYear();
   const copyrightText = affiliation || initials
     ? `© ${currentYear}${affiliation ? ` ${affiliation}` : ''}${initials ? ` ${initials}` : ''}. All Rights Reserved.`
     : '';
 
-  const generateImages = async () => {
+  const generateImages = async (
+    overridePreview?: string,
+    overrideCopyright?: string,
+    overrideBgPrompt?: string
+  ) => {
     setIsProcessing(true);
     try {
       const images = await generateHairImage(
         style!.prompt,
         4,
-        previewImage,
-        copyrightText || undefined,
-        backgroundPrompt
+        overridePreview || previewImage,
+        overrideCopyright || copyrightText || undefined,
+        overrideBgPrompt || backgroundPrompt
       );
 
       let mergedUrl = '';
@@ -106,6 +112,50 @@ const PurchasePage = () => {
     }
   };
 
+  // 토스페이먼츠 폴백: 리다이렉트 결제 성공 콜백
+  useEffect(() => {
+    const paymentKey = searchParams.get('paymentKey');
+    const orderId = searchParams.get('orderId');
+    const amount = searchParams.get('amount');
+
+    if (paymentKey && orderId && amount && !paymentProcessedRef.current) {
+      paymentProcessedRef.current = true;
+      (async () => {
+        setIsProcessing(true);
+        try {
+          const { data: confirmData, error: confirmError } = await supabase.functions.invoke('confirm-payment', {
+            body: { paymentKey, orderId, amount: Number(amount) },
+          });
+          if (confirmError || confirmData?.error) {
+            throw new Error(confirmData?.error || confirmError?.message || '결제 승인 실패');
+          }
+          const savedCopyright = sessionStorage.getItem('purchase_copyright') || undefined;
+          const savedBgPrompt = sessionStorage.getItem('purchase_bgPrompt') || undefined;
+          const savedPreviewImage = sessionStorage.getItem('purchase_previewImage') || undefined;
+          await generateImages(savedPreviewImage, savedCopyright, savedBgPrompt);
+          sessionStorage.removeItem('purchase_copyright');
+          sessionStorage.removeItem('purchase_bgPrompt');
+          sessionStorage.removeItem('purchase_previewImage');
+        } catch (err: any) {
+          toast({ title: '결제 처리 실패', description: err.message, variant: 'destructive' });
+        } finally {
+          setIsProcessing(false);
+        }
+      })();
+    }
+  }, [searchParams]);
+
+  // 토스페이먼츠 폴백: 결제 실패 콜백
+  useEffect(() => {
+    if (searchParams.get('fail') === 'true') {
+      toast({
+        title: '결제 실패',
+        description: searchParams.get('message') || '결제가 취소되었거나 실패했어요.',
+        variant: 'destructive',
+      });
+    }
+  }, []);
+
   if (!style) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -114,27 +164,32 @@ const PurchasePage = () => {
     );
   }
 
-  const handlePurchase = async () => {
+  // 앱인토스 환경 감지
+  const isInTossApp = () => {
+    try {
+      return typeof window !== 'undefined' && /TossApp/i.test(navigator.userAgent);
+    } catch {
+      return false;
+    }
+  };
+
+  const handlePurchaseIAP = async () => {
     setIsPaymentLoading(true);
     try {
       const { IAP } = await import('@apps-in-toss/web-framework');
 
-      if (!IAP) {
-        throw new Error('인앱 결제를 지원하지 않는 환경이에요. 토스 앱에서 다시 시도해 주세요.');
-      }
+      if (!IAP) throw new Error('IAP unavailable');
 
       cleanupRef.current = IAP.createOneTimePurchaseOrder({
         options: {
           sku: IAP_PRODUCT_SKU,
           processProductGrant: async ({ orderId }) => {
             console.log('상품 지급 처리:', orderId);
-            // 결제 완료 — 이미지 생성 시작
             await generateImages();
             return true;
           },
         },
         onEvent: (event: any) => {
-          console.log('IAP event:', event);
           if (event.type === 'success') {
             cleanupRef.current?.();
             cleanupRef.current = null;
@@ -144,25 +199,58 @@ const PurchasePage = () => {
           console.error('IAP error:', error);
           cleanupRef.current?.();
           cleanupRef.current = null;
-
           if (error?.code !== 'USER_CANCEL') {
-            toast({
-              title: '결제 실패',
-              description: error?.message || '결제를 진행할 수 없어요.',
-              variant: 'destructive',
-            });
+            toast({ title: '결제 실패', description: error?.message || '결제 실패', variant: 'destructive' });
           }
           setIsPaymentLoading(false);
         },
       });
-    } catch (err: any) {
-      toast({
-        title: '결제 실패',
-        description: err.message || '결제를 진행할 수 없어요.',
-        variant: 'destructive',
-      });
+    } catch {
+      // IAP 실패 시 토스페이먼츠 폴백
+      await handlePurchaseFallback();
     } finally {
       setIsPaymentLoading(false);
+    }
+  };
+
+  const handlePurchaseFallback = async () => {
+    try {
+      if (copyrightText) sessionStorage.setItem('purchase_copyright', copyrightText);
+      if (backgroundPrompt) sessionStorage.setItem('purchase_bgPrompt', backgroundPrompt);
+      if (previewImage) sessionStorage.setItem('purchase_previewImage', previewImage);
+
+      const { loadTossPayments } = await import('@tosspayments/tosspayments-sdk');
+      const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
+      const payment = tossPayments.payment({ customerKey: 'ANONYMOUS' });
+
+      const orderId = `order_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+      const currentUrl = window.location.origin + `/purchase/${styleId}`;
+
+      await payment.requestPayment({
+        method: 'CARD',
+        amount: { currency: 'KRW', value: PRICE },
+        orderId,
+        orderName: `${style!.name} 상세 컷 5장`,
+        successUrl: currentUrl,
+        failUrl: currentUrl + '?fail=true',
+      });
+    } catch (err: any) {
+      if (err?.code !== 'USER_CANCEL') {
+        toast({ title: '결제 실패', description: err.message || '결제 실패', variant: 'destructive' });
+      }
+    }
+  };
+
+  const handlePurchase = async () => {
+    if (isInTossApp()) {
+      await handlePurchaseIAP();
+    } else {
+      setIsPaymentLoading(true);
+      try {
+        await handlePurchaseFallback();
+      } finally {
+        setIsPaymentLoading(false);
+      }
     }
   };
 
