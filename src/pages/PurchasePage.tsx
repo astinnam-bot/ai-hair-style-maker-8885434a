@@ -139,17 +139,6 @@ const PurchasePage = () => {
       }
       setGeneratedImages(mergedUrl ? [...images, mergedUrl] : images);
 
-      // 이미지 생성 성공 → IAP 소모 처리
-      try {
-        const { IAP } = await import('@apps-in-toss/web-framework');
-        if (IAP?.completeProductGrant) {
-          await IAP.completeProductGrant({ sku: IAP_PRODUCT_SKU });
-          console.log('뽑기권 소모 완료');
-        }
-      } catch (e) {
-        console.warn('IAP acknowledge skipped:', e);
-      }
-
       setHasTicket(false);
       toast({ title: '🎉 이미지 생성 완료!', description: '상세 5장이 준비되었어요.' });
     } catch (err: any) {
