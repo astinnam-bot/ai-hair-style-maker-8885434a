@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
 import { ChevronLeft, Check, CreditCard, Sparkles, Loader2, Download, Home } from 'lucide-react';
 
@@ -7,9 +7,11 @@ import { generateHairImage } from '@/lib/generateImage';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-// 앱인토스 콘솔에서 등록한 상품 SKU
+// 앱인토스 인앱결제 SKU
 const IAP_PRODUCT_SKU = import.meta.env.VITE_IAP_PRODUCT_SKU || 'hair_style_detail_5';
-
+// 토스페이먼츠 폴백용
+const PRICE = 9900;
+const TOSS_CLIENT_KEY = import.meta.env.VITE_TOSS_CLIENT_KEY || 'test_ck_DpexMgkW36xpvB2xeDgwrGbR5ozO';
 const shotLabels = [
   { label: '정면 기본 컷', description: '얼굴 정면에서 본 스타일' },
   { label: '45도 측면 컷', description: '비스듬한 각도에서 본 스타일' },
