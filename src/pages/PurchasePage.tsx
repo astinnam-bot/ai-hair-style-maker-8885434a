@@ -77,29 +77,33 @@ const PurchasePage = () => {
     ? `© ${currentYear}${affiliation ? ` ${affiliation}` : ''}${initials ? ` ${initials}` : ''}. All Rights Reserved.`
     : '';
 
-  // Handle Toss payment callback (success)
-  useEffect(() => {
-    const paymentKey = searchParams.get('paymentKey');
-    const orderId = searchParams.get('orderId');
-    const amount = searchParams.get('amount');
-
-    if (paymentKey && orderId && amount && !paymentProcessedRef.current) {
-      paymentProcessedRef.current = true;
-      confirmPaymentAndGenerate(paymentKey, orderId, Number(amount));
-    }
-  }, [searchParams]);
-
-  // Handle payment failure redirect
-  useEffect(() => {
-    if (searchParams.get('fail') === 'true') {
-      const errorMessage = searchParams.get('message');
-      toast({
-        title: '결제 실패',
-        description: errorMessage || '결제가 취소되었거나 실패했어요.',
-        variant: 'destructive',
+  // Initialize payment widget
+  const initWidget = useCallback(async () => {
+    if (widgetsRef.current || !paymentMethodsElRef.current) return;
+    try {
+      const { loadTossPayments } = await import('@tosspayments/tosspayments-sdk');
+      const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
+      const widgets = tossPayments.widgets({ customerKey: 'ANONYMOUS' });
+      await widgets.setAmount({ currency: 'KRW', value: PRICE });
+      await widgets.renderPaymentMethods({
+        selector: '#payment-methods',
+        variantKey: 'DEFAULT',
       });
+      widgetsRef.current = widgets;
+    } catch (e) {
+      console.error('Widget init failed:', e);
     }
   }, []);
+
+  useEffect(() => {
+    if (showPaymentWidget) {
+      // Small delay for DOM to render
+      const timer = setTimeout(() => initWidget(), 100);
+      return () => clearTimeout(timer);
+    } else {
+      widgetsRef.current = null;
+    }
+  }, [showPaymentWidget, initWidget]);
 
   const confirmPaymentAndGenerate = async (paymentKey: string, orderId: string, amount: number) => {
     setIsProcessing(true);
@@ -112,16 +116,12 @@ const PurchasePage = () => {
         throw new Error(confirmData?.error || confirmError?.message || '결제 승인에 실패했어요.');
       }
 
-      const savedCopyright = sessionStorage.getItem('purchase_copyright') || undefined;
-      const savedBgPrompt = sessionStorage.getItem('purchase_bgPrompt') || undefined;
-      const savedPreviewImage = sessionStorage.getItem('purchase_previewImage') || undefined;
-
       const images = await generateHairImage(
         style!.prompt,
         4,
-        savedPreviewImage || previewImage,
-        savedCopyright || copyrightText || undefined,
-        savedBgPrompt || backgroundPrompt
+        previewImage,
+        copyrightText || undefined,
+        backgroundPrompt
       );
 
       let mergedUrl = '';
@@ -132,10 +132,6 @@ const PurchasePage = () => {
       }
       setGeneratedImages(mergedUrl ? [...images, mergedUrl] : images);
       setIsPurchased(true);
-
-      sessionStorage.removeItem('purchase_copyright');
-      sessionStorage.removeItem('purchase_bgPrompt');
-      sessionStorage.removeItem('purchase_previewImage');
     } catch (err: any) {
       toast({
         title: '결제 처리 실패',
@@ -155,31 +151,28 @@ const PurchasePage = () => {
     );
   }
 
-  const handlePurchase = async () => {
+  const handleOpenPayment = () => {
+    setShowPaymentWidget(true);
+  };
+
+  const handleConfirmPayment = async () => {
+    if (!widgetsRef.current) return;
     setIsPaymentLoading(true);
     try {
-      // Save data to sessionStorage before redirect
-      if (copyrightText) sessionStorage.setItem('purchase_copyright', copyrightText);
-      if (backgroundPrompt) sessionStorage.setItem('purchase_bgPrompt', backgroundPrompt);
-      if (previewImage) sessionStorage.setItem('purchase_previewImage', previewImage);
-
-      const { loadTossPayments } = await import('@tosspayments/tosspayments-sdk');
-      const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
-      const payment = tossPayments.payment({ customerKey: 'ANONYMOUS' });
-
       const orderId = `order_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-      const currentUrl = window.location.origin + `/purchase/${styleId}`;
 
-      await payment.requestPayment({
-        method: 'CARD',
-        amount: { currency: 'KRW', value: PRICE },
+      const result = await widgetsRef.current.requestPayment({
         orderId,
         orderName: `${style!.name} 상세 컷 5장`,
-        successUrl: currentUrl,
-        failUrl: currentUrl + `?fail=true`,
       });
+
+      // Promise mode: result contains paymentKey, orderId, amount
+      if (result?.paymentKey) {
+        setShowPaymentWidget(false);
+        await confirmPaymentAndGenerate(result.paymentKey, result.orderId, result.amount.value);
+      }
     } catch (err: any) {
-      if (err?.code !== 'USER_CANCEL') {
+      if (err?.code !== 'USER_CANCEL' && err?.code !== 'INVALID_ORDER_ID') {
         toast({
           title: '결제 실패',
           description: err.message || '결제를 진행할 수 없어요.',
