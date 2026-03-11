@@ -208,7 +208,7 @@ const PurchasePage = () => {
             {generatedImages[4] && (
               <div className="mb-5 animate-fade-in">
                 <div
-                  className="w-full aspect-square rounded-2xl overflow-hidden mb-2 cursor-pointer active:scale-[0.98] transition-transform"
+                  className="w-full aspect-square rounded-2xl overflow-hidden mb-2 cursor-pointer active:scale-[0.98] transition-transform relative"
                   onClick={() => downloadImage(generatedImages[4], `${style.name}_4컷_병합.jpg`)}
                 >
                   <img src={generatedImages[4]} alt="병합 이미지" className="w-full h-full object-cover rounded-2xl" />
