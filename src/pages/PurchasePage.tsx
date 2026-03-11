@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
 import { ChevronLeft, Check, Sparkles, Loader2, Download, Home, Ticket } from 'lucide-react';
+import { downloadImage } from '@/lib/downloadImage';
 
 import { generateHairImage } from '@/lib/generateImage';
 import { useToast } from '@/hooks/use-toast';
@@ -206,8 +207,14 @@ const PurchasePage = () => {
           <div className="animate-slide-up">
             {generatedImages[4] && (
               <div className="mb-5 animate-fade-in">
-                <div className="w-full aspect-square rounded-2xl overflow-hidden mb-2">
+                <div
+                  className="w-full aspect-square rounded-2xl overflow-hidden mb-2 cursor-pointer active:scale-[0.98] transition-transform"
+                  onClick={() => downloadImage(generatedImages[4], `${style.name}_4컷_병합.jpg`)}
+                >
                   <img src={generatedImages[4]} alt="병합 이미지" className="w-full h-full object-cover rounded-2xl" />
+                  <div className="absolute inset-0 flex items-end justify-center pb-3 bg-gradient-to-t from-black/30 to-transparent rounded-2xl opacity-0 hover:opacity-100 transition-opacity">
+                    <span className="text-white text-[12px] font-semibold flex items-center gap-1"><Download className="w-3.5 h-3.5" /> 탭하여 저장</span>
+                  </div>
                 </div>
                 <p className="text-[13px] font-semibold text-foreground">4컷 병합 이미지</p>
                 <p className="text-[11px] text-muted-foreground">정면 · 45도 · 측면 · 후면 한눈에 보기</p>
@@ -217,9 +224,17 @@ const PurchasePage = () => {
             <div className="grid grid-cols-2 gap-3 mb-5">
               {shotLabels.map((shot, i) => (
                 <div key={i} className="animate-fade-in" style={{ animationDelay: `${(i + 1) * 150}ms`, animationFillMode: 'backwards' }}>
-                  <div className="w-full aspect-[3/4] rounded-2xl relative overflow-hidden mb-2">
+                  <div
+                    className="w-full aspect-[3/4] rounded-2xl relative overflow-hidden mb-2 cursor-pointer active:scale-[0.98] transition-transform"
+                    onClick={() => generatedImages[i] && downloadImage(generatedImages[i], `${style.name}_${shot.label}.jpg`)}
+                  >
                     {generatedImages[i] ? (
-                      <img src={generatedImages[i]} alt={shot.label} className="w-full h-full object-cover rounded-2xl" />
+                      <>
+                        <img src={generatedImages[i]} alt={shot.label} className="w-full h-full object-cover rounded-2xl" />
+                        <div className="absolute inset-0 flex items-end justify-center pb-3 bg-gradient-to-t from-black/30 to-transparent rounded-2xl opacity-0 hover:opacity-100 transition-opacity">
+                          <span className="text-white text-[12px] font-semibold flex items-center gap-1"><Download className="w-3.5 h-3.5" /> 탭하여 저장</span>
+                        </div>
+                      </>
                     ) : (
                       <div className="w-full h-full bg-secondary rounded-2xl flex items-center justify-center">
                         <Sparkles className="w-8 h-8 text-muted-foreground opacity-40" />
