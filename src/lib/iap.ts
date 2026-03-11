@@ -155,9 +155,8 @@ export async function fetchOrderHistory(
 ): Promise<OrderHistoryResult> {
   try {
     const IAP = await getIAP();
-    const result = await IAP.getCompletedOrRefundedOrders(
-      key ? { key } : undefined,
-    );
+    const params = key ? { key } : undefined;
+    const result = await (IAP as any).getCompletedOrRefundedOrders(params);
     return {
       orders: result?.orders ?? [],
       hasNext: result?.hasNext ?? false,

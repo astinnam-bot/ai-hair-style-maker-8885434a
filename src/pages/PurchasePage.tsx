@@ -82,39 +82,28 @@ const PurchasePage = () => {
   const handleBuyTicket = async () => {
     setIsPurchasing(true);
     try {
-      const { IAP } = await import('@apps-in-toss/web-framework');
-      if (!IAP) throw new Error('IAP를 사용할 수 없는 환경이에요.');
-
-      cleanupRef.current = IAP.createOneTimePurchaseOrder({
-        options: {
-          sku: IAP_PRODUCT_SKU,
-          processProductGrant: async ({ orderId }) => {
-            console.log('뽑기권 지급 완료:', orderId);
-            setHasTicket(true);
-            // 아직 소모하지 않음 — 이미지 생성 성공 후 소모됨
-            return false;
-          },
+      const cleanup = await purchaseTicket({
+        onGranted: (orderId) => {
+          console.log('[PurchasePage] 상품 지급 완료:', orderId);
+          setHasTicket(true);
         },
-        onEvent: (event: any) => {
-          if (event.type === 'success') {
-            // processProductGrant가 호출되지 않는 경우를 대비한 fallback
-            setHasTicket(true);
-            toast({ title: '🎫 뽑기권 구매 완료!', description: '이제 상세 이미지를 생성할 수 있어요.' });
-            cleanupRef.current?.();
-            cleanupRef.current = null;
-          }
-          setIsPurchasing(false);
+        onSuccess: () => {
+          toast({ title: '🎫 뽑기권 구매 완료!', description: '이제 상세 이미지를 생성할 수 있어요.' });
+          cleanupRef.current?.();
+          cleanupRef.current = null;
         },
-        onError: (error: any) => {
-          console.error('IAP error:', error);
+        onError: (error) => {
           cleanupRef.current?.();
           cleanupRef.current = null;
           if (error?.code !== 'USER_CANCEL') {
             toast({ title: '구매 실패', description: error?.message || '결제에 실패했어요.', variant: 'destructive' });
           }
+        },
+        onFinally: () => {
           setIsPurchasing(false);
         },
       });
+      cleanupRef.current = cleanup;
     } catch (err: any) {
       toast({ title: '구매 불가', description: err.message || '토스 앱 내에서만 구매할 수 있어요.', variant: 'destructive' });
       setIsPurchasing(false);
