@@ -33,6 +33,9 @@ const Index = () => {
       </header>
 
       <main className="flex-1 px-5 pb-10">
+        <div className="mb-5">
+          <TicketBanner />
+        </div>
         <div className="grid grid-cols-2 gap-3">
           {genderChoices.map((opt) => (
             <button

@@ -44,6 +44,9 @@ const CategoryPage = () => {
 
       {/* Categories */}
       <main className="flex-1 px-5 pb-10">
+        <div className="mb-5">
+          <TicketBanner />
+        </div>
         <div className="flex flex-col gap-3">
           {categoryOptions.map((cat, index) => (
             <button
