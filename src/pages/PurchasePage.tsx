@@ -142,8 +142,8 @@ const PurchasePage = () => {
       // 이미지 생성 성공 → IAP 소모 처리
       try {
         const { IAP } = await import('@apps-in-toss/web-framework');
-        if (IAP?.acknowledgeProductGrant) {
-          await IAP.acknowledgeProductGrant({ sku: IAP_PRODUCT_SKU });
+        if (IAP?.completeProductGrant) {
+          await IAP.completeProductGrant({ sku: IAP_PRODUCT_SKU });
           console.log('뽑기권 소모 완료');
         }
       } catch (e) {
