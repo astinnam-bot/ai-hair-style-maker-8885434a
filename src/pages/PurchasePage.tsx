@@ -278,8 +278,8 @@ const PurchasePage = () => {
                 워터마크 없는 고화질 이미지 5장이 제공돼요 (상세 4장 + 병합 1장)
               </p>
               <div className="flex items-center gap-2 mt-3">
-                <img src="https://static.toss.im/icons/png/4x/icon-toss-logo.png" alt="토스페이" className="h-5" />
-                <span className="text-[12px] text-muted-foreground">토스페이먼츠로 안전하게 결제돼요</span>
+                <img src="https://static.toss.im/icons/png/4x/icon-toss-logo.png" alt="토스" className="h-5" />
+                <span className="text-[12px] text-muted-foreground">토스 인앱결제로 안전하게 결제돼요</span>
               </div>
             </div>
 
