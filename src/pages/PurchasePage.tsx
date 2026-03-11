@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
 // 앱인토스 인앱결제 SKU (소모성 뽑기권)
-const IAP_PRODUCT_SKU = import.meta.env.VITE_IAP_PRODUCT_SKU || 'hair_style_detail_5';
+const IAP_PRODUCT_SKU = import.meta.env.VITE_IAP_PRODUCT_SKU || 'ait.0000022278.5a3a62a1.67f4825513.3234914875';
 
 const shotLabels = [
   { label: '정면 기본 컷', description: '얼굴 정면에서 본 스타일' },
