@@ -63,58 +63,20 @@ const PurchasePage = () => {
   const [isPurchased, setIsPurchased] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
-  const [showPaymentWidget, setShowPaymentWidget] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [affiliation, setAffiliation] = useState('');
   const [initials, setInitials] = useState('');
   const { toast } = useToast();
-  const widgetsRef = useRef<any>(null);
-  const paymentMethodsElRef = useRef<HTMLDivElement>(null);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
   const currentYear = new Date().getFullYear();
   const copyrightText = affiliation || initials
     ? `© ${currentYear}${affiliation ? ` ${affiliation}` : ''}${initials ? ` ${initials}` : ''}. All Rights Reserved.`
     : '';
 
-  // Initialize payment widget
-  const initWidget = useCallback(async () => {
-    if (widgetsRef.current || !paymentMethodsElRef.current) return;
-    try {
-      const { loadTossPayments } = await import('@tosspayments/tosspayments-sdk');
-      const tossPayments = await loadTossPayments(TOSS_CLIENT_KEY);
-      const widgets = tossPayments.widgets({ customerKey: 'ANONYMOUS' });
-      await widgets.setAmount({ currency: 'KRW', value: PRICE });
-      await widgets.renderPaymentMethods({
-        selector: '#payment-methods',
-        variantKey: 'DEFAULT',
-      });
-      widgetsRef.current = widgets;
-    } catch (e) {
-      console.error('Widget init failed:', e);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (showPaymentWidget) {
-      // Small delay for DOM to render
-      const timer = setTimeout(() => initWidget(), 100);
-      return () => clearTimeout(timer);
-    } else {
-      widgetsRef.current = null;
-    }
-  }, [showPaymentWidget, initWidget]);
-
-  const confirmPaymentAndGenerate = async (paymentKey: string, orderId: string, amount: number) => {
+  const generateImages = async () => {
     setIsProcessing(true);
     try {
-      const { data: confirmData, error: confirmError } = await supabase.functions.invoke('confirm-payment', {
-        body: { paymentKey, orderId, amount },
-      });
-
-      if (confirmError || confirmData?.error) {
-        throw new Error(confirmData?.error || confirmError?.message || '결제 승인에 실패했어요.');
-      }
-
       const images = await generateHairImage(
         style!.prompt,
         4,
@@ -133,7 +95,7 @@ const PurchasePage = () => {
       setIsPurchased(true);
     } catch (err: any) {
       toast({
-        title: '결제 처리 실패',
+        title: '이미지 생성 실패',
         description: err.message || '잠시 후 다시 시도해 주세요.',
         variant: 'destructive',
       });
@@ -150,34 +112,53 @@ const PurchasePage = () => {
     );
   }
 
-  const handleOpenPayment = () => {
-    setShowPaymentWidget(true);
-  };
-
-  const handleConfirmPayment = async () => {
-    if (!widgetsRef.current) return;
+  const handlePurchase = async () => {
     setIsPaymentLoading(true);
     try {
-      const orderId = `order_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+      const { IAP } = await import('@apps-in-toss/web-framework');
 
-      const result = await widgetsRef.current.requestPayment({
-        orderId,
-        orderName: `${style!.name} 상세 컷 5장`,
+      if (!IAP) {
+        throw new Error('인앱 결제를 지원하지 않는 환경이에요. 토스 앱에서 다시 시도해 주세요.');
+      }
+
+      cleanupRef.current = IAP.createOneTimePurchaseOrder({
+        options: {
+          sku: IAP_PRODUCT_SKU,
+          processProductGrant: async ({ orderId }) => {
+            console.log('상품 지급 처리:', orderId);
+            // 결제 완료 — 이미지 생성 시작
+            await generateImages();
+            return true;
+          },
+        },
+        onEvent: (event: any) => {
+          console.log('IAP event:', event);
+          if (event.type === 'success') {
+            cleanupRef.current?.();
+            cleanupRef.current = null;
+          }
+        },
+        onError: (error: any) => {
+          console.error('IAP error:', error);
+          cleanupRef.current?.();
+          cleanupRef.current = null;
+
+          if (error?.code !== 'USER_CANCEL') {
+            toast({
+              title: '결제 실패',
+              description: error?.message || '결제를 진행할 수 없어요.',
+              variant: 'destructive',
+            });
+          }
+          setIsPaymentLoading(false);
+        },
       });
-
-      // Promise mode: result contains paymentKey, orderId, amount
-      if (result?.paymentKey) {
-        setShowPaymentWidget(false);
-        await confirmPaymentAndGenerate(result.paymentKey, result.orderId, result.amount.value);
-      }
     } catch (err: any) {
-      if (err?.code !== 'USER_CANCEL' && err?.code !== 'INVALID_ORDER_ID') {
-        toast({
-          title: '결제 실패',
-          description: err.message || '결제를 진행할 수 없어요.',
-          variant: 'destructive',
-        });
-      }
+      toast({
+        title: '결제 실패',
+        description: err.message || '결제를 진행할 수 없어요.',
+        variant: 'destructive',
+      });
     } finally {
       setIsPaymentLoading(false);
     }
