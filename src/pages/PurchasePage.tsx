@@ -142,7 +142,7 @@ const PurchasePage = () => {
       }
       setGeneratedImages(mergedUrl ? [...images, mergedUrl] : images);
 
-      setHasTicket(false);
+      consumeTicket();
       toast({ title: '🎉 이미지 생성 완료!', description: '상세 5장이 준비되었어요.' });
     } catch (err: any) {
       toast({
