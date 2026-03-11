@@ -96,6 +96,8 @@ const PurchasePage = () => {
         },
         onEvent: (event: any) => {
           if (event.type === 'success') {
+            // processProductGrant가 호출되지 않는 경우를 대비한 fallback
+            setHasTicket(true);
             toast({ title: '🎫 뽑기권 구매 완료!', description: '이제 상세 이미지를 생성할 수 있어요.' });
             cleanupRef.current?.();
             cleanupRef.current = null;
