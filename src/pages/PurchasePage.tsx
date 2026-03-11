@@ -303,23 +303,42 @@ const PurchasePage = () => {
               </div>
             </div>
 
-            <button
-              onClick={handlePurchase}
-              disabled={isPaymentLoading}
-              className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {isPaymentLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  결제 준비 중...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="w-5 h-5" />
-                  ₩9,900 결재해요
-                </>
-              )}
-            </button>
+            {!showPaymentWidget ? (
+              <button
+                onClick={handleOpenPayment}
+                className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <CreditCard className="w-5 h-5" />
+                ₩9,900 결재해요
+              </button>
+            ) : (
+              <div className="animate-fade-in">
+                <div id="payment-methods" ref={paymentMethodsElRef} className="mb-4 rounded-2xl overflow-hidden" />
+                <button
+                  onClick={handleConfirmPayment}
+                  disabled={isPaymentLoading}
+                  className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isPaymentLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      결제 진행 중...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-5 h-5" />
+                      결제하기
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => { setShowPaymentWidget(false); widgetsRef.current = null; }}
+                  className="w-full mt-2 bg-secondary text-foreground rounded-2xl py-3 text-[14px] font-semibold transition-all duration-200 active:scale-[0.98]"
+                >
+                  취소
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="animate-slide-up">
