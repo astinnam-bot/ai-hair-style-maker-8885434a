@@ -368,15 +368,14 @@ const PurchasePage = () => {
               <TicketBanner />
             </div>
 
-            {hasTicket && (
-              <button
-                onClick={handleGenerate}
-                className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 animate-fade-in"
-              >
-                <Sparkles className="w-5 h-5" />
-                상세 이미지 생성하기
-              </button>
-            )}
+            <button
+              onClick={handleGenerate}
+              disabled={!hasTicket}
+              className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <Sparkles className="w-5 h-5" />
+              {hasTicket ? '상세 이미지 생성하기' : '🎫 뽑기권 구매 후 생성 가능'}
+            </button>
           </div>
         )}
       </main>
