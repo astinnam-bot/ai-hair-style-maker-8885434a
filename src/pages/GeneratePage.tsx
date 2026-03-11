@@ -3,6 +3,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
 import { ChevronLeft, Sparkles, Loader2, Home } from 'lucide-react';
 import { generateHairImage } from '@/lib/generateImage';
+import TicketBanner from '@/components/TicketBanner';
 
 import { useToast } from '@/hooks/use-toast';
 
