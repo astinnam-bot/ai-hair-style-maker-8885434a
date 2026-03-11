@@ -53,30 +53,30 @@ const TicketBanner = () => {
   };
 
   return (
-    <div className="bg-card rounded-2xl border border-border p-3 flex items-center gap-3 animate-fade-in">
+    <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-4 animate-fade-in">
       <img
         src={ticketImage}
         alt="모델 1회 뽑기권"
-        className="w-20 h-14 object-cover rounded-xl flex-shrink-0"
+        className="w-28 h-20 object-cover rounded-xl flex-shrink-0"
       />
       <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-bold text-foreground leading-tight">모델 1회 뽑기권</p>
-        <p className="text-[11px] text-muted-foreground mt-0.5">
+        <p className="text-[17px] font-bold text-foreground leading-tight">모델 1회 뽑기권</p>
+        <p className="text-[14px] text-muted-foreground mt-1">
           {hasTicket ? '🎫 보유 중! 상세 이미지를 생성하세요' : '상세 5장 고화질 이미지 생성'}
         </p>
       </div>
       {hasTicket ? (
-        <span className="flex-shrink-0 bg-primary/10 text-primary text-[12px] font-bold px-3 py-2 rounded-xl">
+        <span className="flex-shrink-0 bg-primary/10 text-primary text-[15px] font-bold px-5 py-3 rounded-xl">
           보유 중 ✅
         </span>
       ) : (
         <button
           onClick={handleBuyTicket}
           disabled={isPurchasing}
-          className="flex-shrink-0 bg-primary text-primary-foreground text-[12px] font-bold px-3 py-2 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-1"
+          className="flex-shrink-0 bg-primary text-primary-foreground text-[15px] font-bold px-5 py-3 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-1"
         >
           {isPurchasing ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             '🎫 구매'
           )}
