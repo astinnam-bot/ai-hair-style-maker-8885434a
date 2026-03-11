@@ -167,7 +167,7 @@ const PurchasePage = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="px-5 pt-14 pb-4">
+      <header className="px-5 pt-14 pb-4 relative z-10">
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={() => navigate(-1)}
