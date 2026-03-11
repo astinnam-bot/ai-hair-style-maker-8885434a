@@ -5,9 +5,10 @@ import { ChevronLeft, Check, Sparkles, Loader2, Download, Home, Ticket } from 'l
 
 import { generateHairImage } from '@/lib/generateImage';
 import { useToast } from '@/hooks/use-toast';
+import { useTicket } from '@/contexts/TicketContext';
 import { supabase } from '@/integrations/supabase/client';
+import TicketBanner from '@/components/TicketBanner';
 
-// 앱인토스 인앱결제 SKU (소모성 뽑기권)
 const IAP_PRODUCT_SKU = import.meta.env.VITE_IAP_PRODUCT_SKU || 'ait.0000022278.5a3a62a1.67f4825513.3234914875';
 
 const shotLabels = [
