@@ -15,7 +15,7 @@ const TicketContext = createContext<TicketContextType>({
 export const useTicket = () => useContext(TicketContext);
 
 export const TicketProvider = ({ children }: { children: ReactNode }) => {
-  const [hasTicket, setHasTicket] = useState(false);
+  const [hasTicket, setHasTicket] = useState(true); // 테스트모드: 뽑기권 보유 상태
 
   const consumeTicket = useCallback(() => {
     setHasTicket(false);
