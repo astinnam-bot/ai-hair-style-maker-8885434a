@@ -62,7 +62,7 @@ const PurchasePage = () => {
   const backgroundPrompt = (location.state as any)?.backgroundPrompt as string | undefined;
   const style = allStyles.find(s => s.id === styleId);
 
-  const [hasTicket, setHasTicket] = useState(false);
+  const { hasTicket, setHasTicket, consumeTicket } = useTicket();
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
