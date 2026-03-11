@@ -58,18 +58,19 @@ const PurchasePage = () => {
   const navigate = useNavigate();
   const { styleId } = useParams<{ styleId: string }>();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
   const previewImage = (location.state as any)?.previewImage as string | undefined;
   const backgroundPrompt = (location.state as any)?.backgroundPrompt as string | undefined;
   const style = allStyles.find(s => s.id === styleId);
   const [isPurchased, setIsPurchased] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+  const [showPaymentWidget, setShowPaymentWidget] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [affiliation, setAffiliation] = useState('');
   const [initials, setInitials] = useState('');
   const { toast } = useToast();
-  const paymentProcessedRef = useRef(false);
+  const widgetsRef = useRef<any>(null);
+  const paymentMethodsElRef = useRef<HTMLDivElement>(null);
 
   const currentYear = new Date().getFullYear();
   const copyrightText = affiliation || initials
