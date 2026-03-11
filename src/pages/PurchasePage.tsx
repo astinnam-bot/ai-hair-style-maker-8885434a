@@ -369,7 +369,7 @@ const PurchasePage = () => {
               </p>
               <div className="flex items-center gap-2 mt-3">
                 <img src="https://static.toss.im/icons/png/4x/icon-toss-logo.png" alt="토스" className="h-5" />
-                <span className="text-[12px] text-muted-foreground">토스 인앱결제로 안전하게 결제돼요</span>
+                <span className="text-[12px] text-muted-foreground">토스로 안전하게 결제돼요</span>
               </div>
             </div>
 
