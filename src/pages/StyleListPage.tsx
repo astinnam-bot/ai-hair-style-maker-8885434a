@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { getStyles, categoryOptions, type Gender, type Category } from '@/data/hairStyles';
-import { ChevronLeft, Sparkles, Loader2, ImagePlus, RefreshCw, Home } from 'lucide-react';
+import { Sparkles, Loader2, ImagePlus, RefreshCw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import TicketBanner from '@/components/TicketBanner';
 
@@ -77,26 +77,7 @@ const StyleListPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="px-5 pt-14 pb-4">
-        <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={() => navigate(`/category/${gender}`)}
-            className="flex items-center gap-1 bg-primary text-primary-foreground text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            뒤로
-          </button>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-1 bg-primary text-primary-foreground text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              <Home className="w-4 h-4" />
-              첫화면으로
-            </button>
-            
-          </div>
-        </div>
+      <header className="px-5 pt-8 pb-4">
         <h1 className="text-[24px] font-bold text-foreground">
           {genderLabel} · {catLabel}
         </h1>

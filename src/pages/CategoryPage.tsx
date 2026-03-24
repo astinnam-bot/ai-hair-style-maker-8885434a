@@ -1,6 +1,5 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { categoryOptions, type Gender } from '@/data/hairStyles';
-import { ChevronLeft, Home } from 'lucide-react';
 import TicketBanner from '@/components/TicketBanner';
 
 
@@ -14,26 +13,7 @@ const CategoryPage = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="px-5 pt-14 pb-6">
-        <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-1 bg-primary text-primary-foreground text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            뒤로
-          </button>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center gap-1 bg-primary text-primary-foreground text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              <Home className="w-4 h-4" />
-              첫화면으로
-            </button>
-            
-          </div>
-        </div>
+      <header className="px-5 pt-8 pb-6">
         <h1 className="text-[26px] font-bold text-foreground">
           {genderLabel} 스타일
         </h1>
