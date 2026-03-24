@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
-import { ChevronLeft, Check, Sparkles, Loader2, Download, Home, Ticket } from 'lucide-react';
+import { Check, Sparkles, Loader2, Download, Ticket } from 'lucide-react';
 import { downloadImage } from '@/lib/downloadImage';
 
 import { generateHairImage } from '@/lib/generateImage';
