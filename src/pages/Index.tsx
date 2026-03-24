@@ -19,7 +19,7 @@ const Index = () => {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <Scissors className="w-6 h-6 text-primary" />
-            <span className="text-sm font-semibold text-primary">AI HAIR STYLE</span>
+            <span className="text-sm font-semibold text-primary">Ai 헤어 스타일</span>
           </div>
           
         </div>
