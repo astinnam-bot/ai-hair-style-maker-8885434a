@@ -154,24 +154,8 @@ const PurchasePage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="px-5 pt-14 pb-4 relative z-10">
-        <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-1 bg-primary text-primary-foreground text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            뒤로
-          </button>
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-1 bg-primary text-primary-foreground text-sm font-semibold px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <Home className="w-4 h-4" />
-            첫화면으로
-          </button>
-        </div>
+       {/* Header */}
+       <header className="px-5 pt-8 pb-4 relative z-10">
         <h1 className="text-[24px] font-bold text-foreground">
           {isCompleted ? '생성 완료 🎉' : isGenerating ? '이미지 생성 중...' : '상세 컷 뽑기'}
         </h1>
