@@ -1,6 +1,5 @@
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { categoryOptions, type Gender } from '@/data/hairStyles';
-import { ChevronLeft, Home } from 'lucide-react';
 import TicketBanner from '@/components/TicketBanner';
 
 
