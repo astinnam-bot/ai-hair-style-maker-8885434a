@@ -9,7 +9,11 @@ export default defineConfig({
       build: 'npm run build',
     },
   },
-  brand: {},
+  brand: {
+    displayName: 'AI Hair Style',
+    primaryColor: '#3182F6',
+    icon: '/favicon.ico',
+  },
   permissions: [],
   navigationBar: {
     withBackButton: true,
