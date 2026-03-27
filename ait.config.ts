@@ -1,7 +1,7 @@
 import { defineConfig } from '@apps-in-toss/web-framework/config';
 
 export default defineConfig({
-  appName: 'ai-hair-style',
+  appName: 'aihairstyle',
   web: {
     port: 5173,
     commands: {
