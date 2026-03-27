@@ -15,6 +15,9 @@ export default defineConfig({
     icon: '/favicon.ico',
   },
   permissions: [],
+  webViewProps: {
+    type: 'partner',
+  },
   navigationBar: {
     withBackButton: true,
     withHomeButton: true,
