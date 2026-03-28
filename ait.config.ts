@@ -12,7 +12,7 @@ export default defineConfig({
   brand: {
     displayName: 'AI Hair Style',
     primaryColor: '#3182F6',
-    icon: '/favicon.ico',
+    icon: './favicon.ico',
   },
   permissions: [],
   webViewProps: {
