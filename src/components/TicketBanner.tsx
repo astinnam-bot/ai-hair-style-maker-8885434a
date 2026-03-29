@@ -75,41 +75,43 @@ const TicketBanner = () => {
   const iconUrl = product?.iconUrl;
 
   return (
-    <div className="bg-card rounded-2xl border border-border p-4 flex flex-col items-center gap-3 animate-fade-in">
+    <div className="bg-card rounded-2xl border border-border p-4 flex flex-row items-center gap-4 animate-fade-in">
       <img
         src={iconUrl || ticketImage}
         alt={displayName}
-        className="w-full max-w-[200px] h-auto object-cover rounded-xl"
+        className="w-20 h-20 object-cover rounded-xl flex-shrink-0"
       />
-      <div className="text-center w-full">
-        <p className="text-[17px] font-bold text-foreground leading-tight">{displayName}</p>
-        <p className="text-[14px] text-muted-foreground mt-1">
-          {isRecovering
-            ? '⏳ 이전 결제 확인 중...'
-            : hasTicket
-              ? '🎫 보유 중! 상세 이미지를 생성하세요'
-              : displayAmount
-                ? `${displayAmount} · 상세 5장 고화질 이미지 생성`
-                : '상세 5장 고화질 이미지 생성'}
-        </p>
+      <div className="flex flex-col gap-2 flex-1 min-w-0">
+        <div>
+          <p className="text-[15px] font-bold text-foreground leading-tight">{displayName}</p>
+          <p className="text-[13px] text-muted-foreground mt-0.5">
+            {isRecovering
+              ? '⏳ 이전 결제 확인 중...'
+              : hasTicket
+                ? '🎫 보유 중! 상세 이미지를 생성하세요'
+                : displayAmount
+                  ? `${displayAmount} · 상세 5장 고화질 이미지 생성`
+                  : '상세 5장 고화질 이미지 생성'}
+          </p>
+        </div>
+        {hasTicket ? (
+          <span className="bg-primary/10 text-primary text-[13px] font-bold px-4 py-2 rounded-xl text-center">
+            보유 중 ✅
+          </span>
+        ) : (
+          <button
+            onClick={handleBuyTicket}
+            disabled={isPurchasing || isRecovering}
+            className="w-full bg-primary text-primary-foreground text-[13px] font-bold px-4 py-2 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
+          >
+            {isPurchasing || isRecovering ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              '🎫 구매'
+            )}
+          </button>
+        )}
       </div>
-      {hasTicket ? (
-        <span className="bg-primary/10 text-primary text-[15px] font-bold px-5 py-3 rounded-xl">
-          보유 중 ✅
-        </span>
-      ) : (
-        <button
-          onClick={handleBuyTicket}
-          disabled={isPurchasing || isRecovering}
-          className="w-full bg-primary text-primary-foreground text-[15px] font-bold px-5 py-3 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-1"
-        >
-          {isPurchasing || isRecovering ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            '🎫 구매'
-          )}
-        </button>
-      )}
     </div>
   );
 };
