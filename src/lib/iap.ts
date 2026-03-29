@@ -26,18 +26,18 @@ export const TICKET_PRODUCTS: TicketProduct[] = [
     fallbackName: '모델 1회 뽑기권',
     fallbackImage: ticketImage1,
   },
-  {
-    sku: 'ait.0000022278.994aeaa3.8d04f700ac.4765816972',
-    ticketCount: 5,
-    fallbackName: '모델 5회 뽑기권',
-    fallbackImage: ticketImage5,
-  },
-  {
-    sku: 'ait.0000022278.27d22d2b.65d8ed9010.4765886508',
-    ticketCount: 10,
-    fallbackName: '모델 10회 뽑기권',
-    fallbackImage: ticketImage10,
-  },
+  // {
+  //   sku: 'ait.0000022278.994aeaa3.8d04f700ac.4765816972',
+  //   ticketCount: 5,
+  //   fallbackName: '모델 5회 뽑기권',
+  //   fallbackImage: ticketImage5,
+  // },
+  // {
+  //   sku: 'ait.0000022278.27d22d2b.65d8ed9010.4765886508',
+  //   ticketCount: 10,
+  //   fallbackName: '모델 10회 뽑기권',
+  //   fallbackImage: ticketImage10,
+  // },
 ];
 
 /** SKU로 상품 정보 찾기 */
