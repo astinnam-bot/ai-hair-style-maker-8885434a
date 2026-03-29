@@ -62,14 +62,12 @@ const PurchasePage = () => {
   const backgroundPrompt = (location.state as any)?.backgroundPrompt as string | undefined;
   const style = allStyles.find(s => s.id === styleId);
 
-  const { hasTicket, setHasTicket, consumeTicket } = useTicket();
-  const [isPurchasing, setIsPurchasing] = useState(false);
+  const { hasTicket, consumeTicket } = useTicket();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [affiliation, setAffiliation] = useState('');
   const [initials, setInitials] = useState('');
   const { toast } = useToast();
-  const cleanupRef = useRef<(() => void) | null>(null);
 
   const currentYear = new Date().getFullYear();
   const copyrightText = affiliation || initials
