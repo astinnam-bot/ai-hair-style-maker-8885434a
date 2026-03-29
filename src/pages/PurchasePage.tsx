@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
 import { Check, Sparkles, Loader2, Download, Ticket } from 'lucide-react';
