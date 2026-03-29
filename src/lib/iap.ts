@@ -9,7 +9,7 @@
 
 export const IAP_PRODUCT_SKU =
   import.meta.env.VITE_IAP_PRODUCT_SKU ||
-  'ait.0000022278.5a3a62a1.67f4825513.3234914875';
+  'ait.0000022278.677d5762.43bae89ca4.4765461137';
 
 /** SDK를 동적 import하고 IAP 객체를 반환 */
 async function getIAP() {
