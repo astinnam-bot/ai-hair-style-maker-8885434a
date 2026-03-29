@@ -76,37 +76,8 @@ const PurchasePage = () => {
 
   const isCompleted = generatedImages.length > 0;
 
-  // 뽑기권 구매 (앱인토스 IAP)
-  const handleBuyTicket = async () => {
-    setIsPurchasing(true);
-    try {
-      const cleanup = await purchaseTicket({
-        onGranted: (orderId) => {
-          console.log('[PurchasePage] 상품 지급 완료:', orderId);
-          setHasTicket(true);
-        },
-        onSuccess: () => {
-          toast({ title: '🎫 뽑기권 구매 완료!', description: '이제 상세 이미지를 생성할 수 있어요.' });
-          cleanupRef.current?.();
-          cleanupRef.current = null;
-        },
-        onError: (error) => {
-          cleanupRef.current?.();
-          cleanupRef.current = null;
-          if (error?.code !== 'USER_CANCEL') {
-            toast({ title: '구매 실패', description: error?.message || '결제에 실패했어요.', variant: 'destructive' });
-          }
-        },
-        onFinally: () => {
-          setIsPurchasing(false);
-        },
-      });
-      cleanupRef.current = cleanup;
-    } catch (err: any) {
-      toast({ title: '구매 불가', description: err.message || '토스 앱 내에서만 구매할 수 있어요.', variant: 'destructive' });
-      setIsPurchasing(false);
-    }
-  };
+
+
 
   // 상세 이미지 생성 (뽑기권 소모)
   const handleGenerate = async () => {
