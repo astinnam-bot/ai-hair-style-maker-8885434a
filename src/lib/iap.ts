@@ -7,9 +7,43 @@
  * 4. getCompletedOrRefundedOrders – 주문 이력 조회
  */
 
-export const IAP_PRODUCT_SKU =
-  import.meta.env.VITE_IAP_PRODUCT_SKU ||
-  'ait.0000022278.677d5762.43bae89ca4.4765461137';
+import ticketImage1 from '@/assets/ticket-voucher-1.png';
+import ticketImage5 from '@/assets/ticket-voucher-5.png';
+import ticketImage10 from '@/assets/ticket-voucher-10.png';
+
+/** 상품 정의 */
+export interface TicketProduct {
+  sku: string;
+  ticketCount: number;
+  fallbackName: string;
+  fallbackImage: string;
+}
+
+export const TICKET_PRODUCTS: TicketProduct[] = [
+  {
+    sku: 'ait.0000022278.677d5762.43bae89ca4.4765461137',
+    ticketCount: 1,
+    fallbackName: '모델 1회 뽑기권',
+    fallbackImage: ticketImage1,
+  },
+  {
+    sku: 'ait.0000022278.994aeaa3.8d04f700ac.4765816972',
+    ticketCount: 5,
+    fallbackName: '모델 5회 뽑기권',
+    fallbackImage: ticketImage5,
+  },
+  {
+    sku: 'ait.0000022278.27d22d2b.65d8ed9010.4765886508',
+    ticketCount: 10,
+    fallbackName: '모델 10회 뽑기권',
+    fallbackImage: ticketImage10,
+  },
+];
+
+/** SKU로 상품 정보 찾기 */
+export function findProductBySku(sku: string): TicketProduct | undefined {
+  return TICKET_PRODUCTS.find((p) => p.sku === sku);
+}
 
 /** SDK를 동적 import하고 IAP 객체를 반환 */
 async function getIAP() {
@@ -50,22 +84,21 @@ export interface PurchaseCallbacks {
 }
 
 /**
- * 1회 소모성 상품 구매를 시작합니다.
- * processProductGrant에서 true를 반환하여 상품 지급 완료를 SDK에 알립니다.
+ * 특정 SKU의 1회 소모성 상품 구매를 시작합니다.
  * @returns cleanup 함수 (구독 해제)
  */
 export async function purchaseTicket(
+  sku: string,
   callbacks: PurchaseCallbacks,
 ): Promise<(() => void) | null> {
   const IAP = await getIAP();
 
   const cleanup = IAP.createOneTimePurchaseOrder({
     options: {
-      sku: IAP_PRODUCT_SKU,
+      sku,
       processProductGrant: async ({ orderId }: { orderId: string }) => {
         console.log('[IAP] processProductGrant 호출, orderId:', orderId);
         callbacks.onGranted(orderId);
-        // ✅ 반드시 true를 반환하여 상품 지급 완료를 SDK에 알림
         return true;
       },
     },
@@ -96,7 +129,7 @@ export interface PendingOrder {
 /**
  * 결제 완료 후 상품이 아직 지급되지 않은 주문을 조회하고,
  * 해당 SKU에 대해 상품 지급 + completeProductGrant를 수행합니다.
- * @returns 복원된 주문 수
+ * @returns 복원된 티켓 수 (각 상품의 ticketCount 합산)
  */
 export async function recoverPendingOrders(): Promise<number> {
   try {
@@ -111,24 +144,25 @@ export async function recoverPendingOrders(): Promise<number> {
 
     console.log('[IAP] 대기 중인 주문 발견:', orders);
 
-    let recovered = 0;
+    const knownSkus = new Set(TICKET_PRODUCTS.map((p) => p.sku));
+    let recoveredTickets = 0;
+
     for (const order of orders) {
-      // 우리 상품 SKU와 일치하는 주문만 처리
-      if (order.sku && order.sku !== IAP_PRODUCT_SKU) continue;
+      if (order.sku && !knownSkus.has(order.sku)) continue;
 
       try {
-        // 상품 지급 완료 처리
         const success = await IAP.completeProductGrant({
           params: { orderId: order.orderId },
         });
         console.log(`[IAP] completeProductGrant(${order.orderId}):`, success);
-        recovered++;
+        const product = findProductBySku(order.sku);
+        recoveredTickets += product?.ticketCount ?? 1;
       } catch (e) {
         console.error(`[IAP] completeProductGrant 실패(${order.orderId}):`, e);
       }
     }
 
-    return recovered;
+    return recoveredTickets;
   } catch (e) {
     console.error('[IAP] recoverPendingOrders 실패:', e);
     return 0;

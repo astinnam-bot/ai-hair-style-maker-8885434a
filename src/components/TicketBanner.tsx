@@ -2,44 +2,41 @@ import { useState, useRef, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTicket } from '@/contexts/TicketContext';
-import ticketImage from '@/assets/ticket-voucher.png';
-import { purchaseTicket, fetchProductList, type IapProduct } from '@/lib/iap';
-
-const IAP_PRODUCT_SKU =
-  import.meta.env.VITE_IAP_PRODUCT_SKU ||
-  'ait.0000022278.677d5762.43bae89ca4.4765461137';
+import {
+  TICKET_PRODUCTS,
+  fetchProductList,
+  purchaseTicket,
+  findProductBySku,
+  type IapProduct,
+} from '@/lib/iap';
 
 const TicketBanner = () => {
-  const [isPurchasing, setIsPurchasing] = useState(false);
-  const [product, setProduct] = useState<IapProduct | null>(null);
-  const { hasTicket, setHasTicket, isRecovering } = useTicket();
+  const [purchasingSku, setPurchasingSku] = useState<string | null>(null);
+  const [iapProducts, setIapProducts] = useState<IapProduct[]>([]);
+  const { ticketCount, hasTicket, addTickets, isRecovering } = useTicket();
   const { toast } = useToast();
   const cleanupRef = useRef<(() => void) | null>(null);
 
-  // 다이어그램 1단계: 상품 목록 가져오기
   useEffect(() => {
     fetchProductList().then((products) => {
-      const matched = products.find((p) => p.sku === IAP_PRODUCT_SKU);
-      if (matched) {
-        setProduct(matched);
-        console.log('[TicketBanner] 상품 정보 로드:', matched);
-      }
+      setIapProducts(products);
+      console.log('[TicketBanner] 상품 목록 로드:', products);
     });
   }, []);
 
-  // 다이어그램 2단계: 인앱 결제 요청
-  const handleBuyTicket = async () => {
-    setIsPurchasing(true);
+  const handleBuy = async (sku: string) => {
+    setPurchasingSku(sku);
+    const product = findProductBySku(sku);
     try {
-      const cleanup = await purchaseTicket({
+      const cleanup = await purchaseTicket(sku, {
         onGranted: (orderId) => {
           console.log('[TicketBanner] 상품 지급 완료:', orderId);
-          setHasTicket(true);
+          addTickets(product?.ticketCount ?? 1);
         },
         onSuccess: () => {
           toast({
             title: '🎫 뽑기권 구매 완료!',
-            description: '이제 상세 이미지를 생성할 수 있어요.',
+            description: `${product?.ticketCount ?? 1}장이 추가되었어요.`,
           });
           cleanupRef.current?.();
           cleanupRef.current = null;
@@ -56,7 +53,7 @@ const TicketBanner = () => {
           }
         },
         onFinally: () => {
-          setIsPurchasing(false);
+          setPurchasingSku(null);
         },
       });
       cleanupRef.current = cleanup;
@@ -66,50 +63,61 @@ const TicketBanner = () => {
         description: err.message || '토스 앱 내에서만 구매할 수 있어요.',
         variant: 'destructive',
       });
-      setIsPurchasing(false);
+      setPurchasingSku(null);
     }
   };
 
-  const displayName = product?.displayName || '모델 1회 뽑기권';
-  const displayAmount = product?.displayAmount;
-  const iconUrl = product?.iconUrl;
-
   return (
-    <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-4 animate-fade-in">
-      <img
-        src={iconUrl || ticketImage}
-        alt={displayName}
-        className="w-28 h-20 object-cover rounded-xl flex-shrink-0"
-      />
-      <div className="flex-1 min-w-0">
-        <p className="text-[17px] font-bold text-foreground leading-tight">{displayName}</p>
-        <p className="text-[14px] text-muted-foreground mt-1">
-          {isRecovering
-            ? '⏳ 이전 결제 확인 중...'
-            : hasTicket
-              ? '🎫 보유 중! 상세 이미지를 생성하세요'
-              : displayAmount
-                ? `${displayAmount} · 상세 5장 고화질 이미지 생성`
-                : '상세 5장 고화질 이미지 생성'}
-        </p>
-      </div>
-      {hasTicket ? (
-        <span className="flex-shrink-0 bg-primary/10 text-primary text-[15px] font-bold px-5 py-3 rounded-xl">
-          보유 중 ✅
-        </span>
-      ) : (
-        <button
-          onClick={handleBuyTicket}
-          disabled={isPurchasing || isRecovering}
-          className="flex-shrink-0 bg-primary text-primary-foreground text-[15px] font-bold px-5 py-3 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-1"
-        >
-          {isPurchasing || isRecovering ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            '🎫 구매'
-          )}
-        </button>
+    <div className="flex flex-col gap-3">
+      {/* 보유 티켓 표시 */}
+      {hasTicket && (
+        <div className="bg-primary/10 rounded-2xl px-4 py-3 text-center animate-fade-in">
+          <span className="text-primary text-[15px] font-bold">🎫 보유 중: {ticketCount}장</span>
+        </div>
       )}
+
+      {/* 상품 목록 */}
+      {TICKET_PRODUCTS.map((tp) => {
+        const iap = iapProducts.find((p) => p.sku === tp.sku);
+        const displayName = iap?.displayName || tp.fallbackName;
+        const displayAmount = iap?.displayAmount;
+        const iconUrl = iap?.iconUrl || tp.fallbackImage;
+        const isBuying = purchasingSku === tp.sku;
+
+        return (
+          <div
+            key={tp.sku}
+            className="bg-card rounded-2xl border border-border p-4 flex items-center gap-4 animate-fade-in"
+          >
+            <img
+              src={iconUrl}
+              alt={displayName}
+              className="w-28 h-20 object-cover rounded-xl flex-shrink-0"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-[17px] font-bold text-foreground leading-tight">{displayName}</p>
+              <p className="text-[14px] text-muted-foreground mt-1">
+                {isRecovering
+                  ? '⏳ 이전 결제 확인 중...'
+                  : displayAmount
+                    ? `${displayAmount} · 상세 ${tp.ticketCount * 5}장 생성`
+                    : `상세 ${tp.ticketCount * 5}장 생성`}
+              </p>
+            </div>
+            <button
+              onClick={() => handleBuy(tp.sku)}
+              disabled={isBuying || isRecovering || !!purchasingSku}
+              className="flex-shrink-0 bg-primary text-primary-foreground text-[15px] font-bold px-5 py-3 rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-1"
+            >
+              {isBuying ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                '🎫 구매'
+              )}
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 };

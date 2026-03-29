@@ -2,30 +2,47 @@ import { createContext, useContext, useState, useCallback, useEffect, type React
 import { recoverPendingOrders } from '@/lib/iap';
 
 interface TicketContextType {
+  ticketCount: number;
   hasTicket: boolean;
-  setHasTicket: (v: boolean) => void;
+  addTickets: (count: number) => void;
   consumeTicket: () => void;
   isRecovering: boolean;
+  /** @deprecated use addTickets instead */
+  setHasTicket: (v: boolean) => void;
 }
 
 const TicketContext = createContext<TicketContextType>({
+  ticketCount: 0,
   hasTicket: false,
-  setHasTicket: () => {},
+  addTickets: () => {},
   consumeTicket: () => {},
   isRecovering: false,
+  setHasTicket: () => {},
 });
 
 export const useTicket = () => useContext(TicketContext);
 
 export const TicketProvider = ({ children }: { children: ReactNode }) => {
-  const [hasTicket, setHasTicket] = useState(false);
+  const [ticketCount, setTicketCount] = useState(0);
   const [isRecovering, setIsRecovering] = useState(false);
 
-  const consumeTicket = useCallback(() => {
-    setHasTicket(false);
+  const hasTicket = ticketCount > 0;
+
+  const addTickets = useCallback((count: number) => {
+    setTicketCount((prev) => prev + count);
   }, []);
 
-  // 앱 진입 시 대기 중인 주문 복원 (다이어그램 3단계)
+  const consumeTicket = useCallback(() => {
+    setTicketCount((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  // 하위 호환
+  const setHasTicket = useCallback((v: boolean) => {
+    if (v) addTickets(1);
+    else setTicketCount(0);
+  }, [addTickets]);
+
+  // 앱 진입 시 대기 중인 주문 복원
   useEffect(() => {
     let cancelled = false;
 
@@ -34,8 +51,8 @@ export const TicketProvider = ({ children }: { children: ReactNode }) => {
       try {
         const recoveredCount = await recoverPendingOrders();
         if (!cancelled && recoveredCount > 0) {
-          console.log(`[TicketContext] ${recoveredCount}건 복원 완료 → 뽑기권 지급`);
-          setHasTicket(true);
+          console.log(`[TicketContext] ${recoveredCount}장 복원 완료`);
+          addTickets(recoveredCount);
         }
       } catch (e) {
         console.error('[TicketContext] 복원 실패:', e);
@@ -46,10 +63,10 @@ export const TicketProvider = ({ children }: { children: ReactNode }) => {
 
     recover();
     return () => { cancelled = true; };
-  }, []);
+  }, [addTickets]);
 
   return (
-    <TicketContext.Provider value={{ hasTicket, setHasTicket, consumeTicket, isRecovering }}>
+    <TicketContext.Provider value={{ ticketCount, hasTicket, addTickets, consumeTicket, isRecovering, setHasTicket }}>
       {children}
     </TicketContext.Provider>
   );
