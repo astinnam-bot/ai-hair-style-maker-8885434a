@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTicket } from '@/contexts/TicketContext';
 import { supabase } from '@/integrations/supabase/client';
 import TicketBanner from '@/components/TicketBanner';
-import { purchaseTicket } from '@/lib/iap';
+
 
 const shotLabels = [
   { label: '정면 기본 컷', description: '얼굴 정면에서 본 스타일' },
