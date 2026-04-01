@@ -158,7 +158,7 @@ serve(async (req) => {
               { type: "image_url", image_url: { url: currentReference } },
               {
                 type: "text",
-                text: `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. IMPORTANT: Frame as an upper body shot from waist up, showing the full torso to clearly showcase both the hairstyle and outfit. The hairstyle must be the focal point. The person MUST be wearing appropriate clothing at all times. Keep the same background atmosphere. The pose should be natural and candid like an SNS photo. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes.${copyrightInstruction}`,
+                text: `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. Ultra sharp focus, high resolution 4K, detailed skin texture, professional DSLR quality. IMPORTANT: Frame as an upper body shot from waist up, showing the full torso to clearly showcase both the hairstyle and outfit. The hairstyle must be the focal point. The person MUST be wearing appropriate clothing at all times. Keep the same background atmosphere. The pose should be natural and candid like an SNS photo. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes.${copyrightInstruction}`,
               },
             ],
           },
