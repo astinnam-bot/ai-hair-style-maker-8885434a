@@ -32,7 +32,7 @@ const maleCuts: HairStyle[] = [
   prompt: `A professional Korean male hair model with a ${name} hairstyle, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography, SNS Instagram style`,
 }));
 
-const FEMALE_PERSONA = `Confession of a young and sophisticated Korean woman. She is putting on subtle and natural makeup with bright and dewy "glass skin" and coral pink lips. She does not look directly into the camera with a slightly chic expression. She is wearing sensual and sophisticated outfits. It creates the aesthetics of the K-beauty look book. Shooting at eye level with subtle bokeh effect.`;
+const FEMALE_PERSONA = `Confession of a young and sophisticated Korean woman. She is putting on subtle and natural makeup with bright and dewy "glass skin" and coral pink lips. She does not look directly into the camera with a slightly chic expression. She is wearing sensual and sophisticated outfits. Shooting at eye level with subtle bokeh effect.`;
 
 const femaleCuts: HairStyle[] = [
   '레이어드컷', '허쉬컷', '보브컷', '태슬컷', '프렌치보브',
