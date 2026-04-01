@@ -80,7 +80,7 @@ const maleColors: HairStyle[] = [
   name,
   gender: 'male',
   category: 'color',
-  prompt: `A professional Korean male hair model with ${name} hair color, beautiful color tones, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
+  prompt: `${MALE_PERSONA} He has ${name} hair color, beautiful color tones, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
 }));
 
 const femaleColors: HairStyle[] = [
