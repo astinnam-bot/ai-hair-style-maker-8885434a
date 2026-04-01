@@ -179,13 +179,13 @@ serve(async (req) => {
 
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
-          const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          const response = await fetch("https://api.cometapi.com/v1/chat/completions", {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              Authorization: `Bearer ${COMET_API_KEY}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ model: "google/gemini-3.1-flash-image-preview", modalities: ["image", "text"], messages }),
+            body: JSON.stringify({ model: "gemini-3.1-flash-image-preview", modalities: ["image", "text"], messages }),
           });
 
           if (!response.ok) {
