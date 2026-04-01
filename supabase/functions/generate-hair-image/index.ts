@@ -136,10 +136,10 @@ serve(async (req) => {
     const timestamp = Date.now();
 
     const angleDescriptions = [
-      "front view upper body close-up portrait, chest and above, clearly showing the hairstyle",
-      "45 degree angle side view upper body close-up, chest and above, clearly showing the hairstyle from an angle",
-      "complete side profile upper body close-up, chest and above, clearly showing the hairstyle silhouette",
-      "back view upper body close-up showing full hairstyle from behind, head and shoulders",
+      "front view upper body shot from waist up, showing full torso and hairstyle clearly",
+      "45 degree angle side view upper body shot from waist up, showing the hairstyle from an angle",
+      "complete side profile upper body shot from waist up, showing the hairstyle silhouette",
+      "back view upper body shot from waist up, showing full hairstyle from behind",
     ];
 
     let currentReference = referenceImage || null;
