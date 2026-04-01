@@ -57,7 +57,7 @@ const malePerms: HairStyle[] = [
   name,
   gender: 'male',
   category: 'perm',
-  prompt: `A professional Korean male hair model with a ${name} perm hairstyle, natural texture, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
+  prompt: `${MALE_PERSONA} He has a ${name} perm hairstyle, natural texture, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
 }));
 
 const femalePerms: HairStyle[] = [
