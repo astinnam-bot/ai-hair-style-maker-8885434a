@@ -15,8 +15,8 @@ function getSeasonalClothing(isMale: boolean): string {
     if (month >= 9 && month <= 11) return pickRandom(["wool crew-neck sweater", "layered flannel shirt", "corduroy jacket over a turtleneck", "knit cardigan over a shirt", "suede bomber jacket with a t-shirt"]);
     return pickRandom(["chunky knit turtleneck sweater", "wool overcoat over a button-up shirt", "cashmere crew-neck sweater", "padded vest over a hoodie", "heavy knit cable sweater"]);
   } else {
-    if (month >= 3 && month <= 5) return pickRandom(["floral blouse", "light cardigan over a camisole", "pastel knit top", "denim jacket over a spring dress", "cotton wrap blouse"]);
-    if (month >= 6 && month <= 8) return pickRandom(["off-shoulder blouse", "lightweight linen top", "airy cotton camisole with a light cardigan", "sleeveless knit top", "breezy floral top"]);
+     if (month >= 3 && month <= 5) return pickRandom(["tailored cropped blazer over a silk camisole", "light cardigan over a camisole", "minimal knit top with clean lines", "denim jacket over a fitted turtleneck", "structured linen blouse"]);
+     if (month >= 6 && month <= 8) return pickRandom(["off-shoulder blouse", "sleek satin camisole top", "minimal ribbed knit top", "sleeveless mock-neck top", "elegant linen wrap top"]);
     if (month >= 9 && month <= 11) return pickRandom(["cozy knit sweater", "trench coat over a blouse", "turtleneck with a blazer", "chunky cardigan", "suede jacket over a fitted top"]);
     return pickRandom(["cashmere turtleneck", "wool coat over a knit dress", "faux fur collar coat over a blouse", "thick cable-knit sweater", "padded jacket with a scarf"]);
   }
