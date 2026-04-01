@@ -117,8 +117,8 @@ serve(async (req) => {
   try {
     const { prompt, count = 1, referenceImage, copyrightText, backgroundPrompt } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const COMET_API_KEY = Deno.env.get("COMET_API_KEY");
+    if (!COMET_API_KEY) throw new Error("COMET_API_KEY is not configured");
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -179,13 +179,13 @@ serve(async (req) => {
 
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
-          const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          const response = await fetch("https://api.cometapi.com/v1/chat/completions", {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              Authorization: `Bearer ${COMET_API_KEY}`,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ model: "google/gemini-3.1-flash-image-preview", modalities: ["image", "text"], messages }),
+            body: JSON.stringify({ model: "gemini-3.1-flash-image-preview", modalities: ["image", "text"], messages }),
           });
 
           if (!response.ok) {
