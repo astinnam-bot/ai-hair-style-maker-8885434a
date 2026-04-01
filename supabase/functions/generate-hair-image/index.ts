@@ -136,10 +136,10 @@ serve(async (req) => {
     const timestamp = Date.now();
 
     const angleDescriptions = [
-      "front view upper body close-up portrait, chest and above, clearly showing the hairstyle",
-      "45 degree angle side view upper body close-up, chest and above, clearly showing the hairstyle from an angle",
-      "complete side profile upper body close-up, chest and above, clearly showing the hairstyle silhouette",
-      "back view upper body close-up showing full hairstyle from behind, head and shoulders",
+      "front view upper body shot from waist up, showing full torso and hairstyle clearly",
+      "45 degree angle side view upper body shot from waist up, showing the hairstyle from an angle",
+      "complete side profile upper body shot from waist up, showing the hairstyle silhouette",
+      "back view upper body shot from waist up, showing full hairstyle from behind",
     ];
 
     let currentReference = referenceImage || null;
@@ -158,7 +158,7 @@ serve(async (req) => {
               { type: "image_url", image_url: { url: currentReference } },
               {
                 type: "text",
-                text: `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. IMPORTANT: Frame as an upper body close-up (chest and above) to clearly showcase the hairstyle. The hairstyle must be the focal point. The person MUST be wearing appropriate clothing at all times. Keep the same background atmosphere. The pose should be natural and candid like an SNS photo. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes.${copyrightInstruction}`,
+                text: `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. IMPORTANT: Frame as an upper body shot from waist up, showing the full torso to clearly showcase both the hairstyle and outfit. The hairstyle must be the focal point. The person MUST be wearing appropriate clothing at all times. Keep the same background atmosphere. The pose should be natural and candid like an SNS photo. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes.${copyrightInstruction}`,
               },
             ],
           },
@@ -169,7 +169,7 @@ serve(async (req) => {
         messages = [
           {
             role: "user",
-            content: `Generate a photorealistic hair model image: ${variedPrompt}. FRAMING: Upper body close-up (chest and above), tightly framed to clearly showcase the hairstyle. The image should look like a stylish SNS Instagram photo with ${bgDesc}. The pose should be natural and candid, not stiff. The outfit should be trendy and well-coordinated.${copyrightInstruction}`,
+            content: `Generate a photorealistic hair model image: ${variedPrompt}. FRAMING: Upper body shot from waist up, showing full torso including shoulders, chest, and waist. Do NOT crop too tightly on the face. The image should look like a stylish SNS Instagram photo with ${bgDesc}. The pose should be natural and candid, not stiff. The outfit should be trendy and well-coordinated.${copyrightInstruction}`,
           },
         ];
       }
