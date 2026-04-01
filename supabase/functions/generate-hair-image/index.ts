@@ -194,7 +194,7 @@ serve(async (req) => {
               contents: [{ parts: contentParts }],
               generationConfig: {
                 responseModalities: ["TEXT", "IMAGE"],
-                imageConfig: { aspectRatio: "1:1", imageSize: "4K" },
+                imageConfig: { aspectRatio: "1:1" },
               },
             }),
           });
