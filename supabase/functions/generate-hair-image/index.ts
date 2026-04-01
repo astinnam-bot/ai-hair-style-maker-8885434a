@@ -215,13 +215,13 @@ serve(async (req) => {
           }
 
           const data = await response.json();
-          // Extract image from native Gemini response format
+          // Extract the LAST (highest quality) image from native Gemini response
           const candidate = data.candidates?.[0];
           if (candidate?.content?.parts) {
             for (const part of candidate.content.parts) {
               if (part.inlineData) {
+                // Always take the last image (highest resolution)
                 imageDataUrl = `data:${part.inlineData.mimeType || "image/png"};base64,${part.inlineData.data}`;
-                break;
               }
             }
           }
