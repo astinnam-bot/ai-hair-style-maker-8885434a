@@ -148,30 +148,35 @@ serve(async (req) => {
       : '';
 
     for (let i = 0; i < Math.min(count, 4); i++) {
-      let messages: any[];
+      let contentParts: any[];
 
       if (currentReference) {
-        messages = [
-          {
-            role: "user",
-            content: [
-              { type: "image_url", image_url: { url: currentReference } },
-              {
-                type: "text",
-                text: `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. Ultra sharp focus, high resolution 4K, square 1:1 aspect ratio, detailed skin texture, professional DSLR quality. IMPORTANT: Frame as an upper body shot from waist up, showing the full torso to clearly showcase both the hairstyle and outfit. The hairstyle must be the focal point. The person MUST be wearing appropriate clothing at all times. Keep the same background atmosphere. The pose should be natural and candid like an SNS photo. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes.${copyrightInstruction}`,
-              },
-            ],
-          },
-        ];
+        const refText = `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. Ultra sharp focus, detailed skin texture, professional DSLR quality. IMPORTANT: Frame as an upper body shot from waist up, showing the full torso to clearly showcase both the hairstyle and outfit. The hairstyle must be the focal point. The person MUST be wearing appropriate clothing at all times. Keep the same background atmosphere. The pose should be natural and candid like an SNS photo. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes.${copyrightInstruction}`;
+
+        // Build parts with reference image
+        const parts: any[] = [{ text: refText }];
+        const base64Match = currentReference.match(/^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/);
+        if (base64Match) {
+          parts.unshift({ inlineData: { mimeType: `image/${base64Match[1]}`, data: base64Match[2] } });
+        } else if (currentReference.startsWith("http")) {
+          // For URL references, download and convert to inline data
+          try {
+            const imgResp = await fetch(currentReference);
+            const imgBuf = await imgResp.arrayBuffer();
+            const imgBase64 = btoa(String.fromCharCode(...new Uint8Array(imgBuf)));
+            const contentType = imgResp.headers.get("content-type") || "image/png";
+            parts.unshift({ inlineData: { mimeType: contentType, data: imgBase64 } });
+          } catch (e) {
+            console.error("Failed to fetch reference image:", e);
+            parts.unshift({ text: `[Reference image URL: ${currentReference}]` });
+          }
+        }
+        contentParts = parts;
       } else {
         const bgDesc = backgroundPrompt || "cozy stylish cafe atmosphere with warm ambient lighting";
         const variedPrompt = buildVarietyPrompt(prompt, backgroundPrompt);
-        messages = [
-          {
-            role: "user",
-            content: `Generate a photorealistic hair model image: ${variedPrompt}. Ultra sharp focus, high resolution 4K, square 1:1 aspect ratio, detailed skin texture, professional DSLR quality. FRAMING: Upper body shot from waist up, showing full torso including shoulders, chest, and waist. Do NOT crop too tightly on the face. The image should look like a stylish SNS Instagram photo with ${bgDesc}. The pose should be natural and candid, not stiff. The outfit should be trendy and well-coordinated.${copyrightInstruction}`,
-          },
-        ];
+        const promptText = `Generate a photorealistic hair model image: ${variedPrompt}. Ultra sharp focus, detailed skin texture, professional DSLR quality. FRAMING: Upper body shot from waist up, showing full torso including shoulders, chest, and waist. Do NOT crop too tightly on the face. The image should look like a stylish SNS Instagram photo with ${bgDesc}. The pose should be natural and candid, not stiff. The outfit should be trendy and well-coordinated.${copyrightInstruction}`;
+        contentParts = [{ text: promptText }];
       }
 
       let imageDataUrl: string | null = null;
@@ -179,19 +184,25 @@ serve(async (req) => {
 
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
-          const response = await fetch("https://api.cometapi.com/v1/chat/completions", {
+          const response = await fetch(`https://api.cometapi.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent`, {
             method: "POST",
             headers: {
-              Authorization: `Bearer ${COMET_API_KEY}`,
+              "x-goog-api-key": COMET_API_KEY,
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ model: "gemini-3.1-flash-image-preview", modalities: ["image", "text"], messages }),
+            body: JSON.stringify({
+              contents: [{ parts: contentParts }],
+              generationConfig: {
+                responseModalities: ["TEXT", "IMAGE"],
+                imageConfig: { aspectRatio: "1:1", imageSize: "4K" },
+              },
+            }),
           });
 
           if (!response.ok) {
             const status = response.status;
             const body = await response.text();
-            console.error(`AI Gateway error (attempt ${attempt + 1}):`, status, body);
+            console.error(`Gemini API error (attempt ${attempt + 1}):`, status, body);
             if (status === 429) {
               return new Response(JSON.stringify({ error: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요." }), {
                 status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -204,7 +215,20 @@ serve(async (req) => {
           }
 
           const data = await response.json();
-          imageDataUrl = extractImageUrl(data.choices?.[0]?.message);
+          // Extract image from native Gemini response format
+          const candidate = data.candidates?.[0];
+          if (candidate?.content?.parts) {
+            for (const part of candidate.content.parts) {
+              if (part.inlineData) {
+                imageDataUrl = `data:${part.inlineData.mimeType || "image/png"};base64,${part.inlineData.data}`;
+                break;
+              }
+            }
+          }
+          // Fallback to OpenAI-compatible format
+          if (!imageDataUrl) {
+            imageDataUrl = extractImageUrl(candidate?.message || candidate);
+          }
 
           if (imageDataUrl) break;
           console.error(`No image extracted (attempt ${attempt + 1}):`, JSON.stringify(data).slice(0, 500));
