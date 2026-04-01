@@ -69,7 +69,7 @@ const backgroundDesc = bgPrompt || "cozy stylish cafe atmosphere with warm ambie
   const isWestern = lowerPrompt.includes("western") || lowerPrompt.includes("caucasian") || lowerPrompt.includes("foreign");
   const ethnicityDesc = isWestern ? "Western Caucasian" : "Korean";
 
-  return `${cleaned}. Ultra sharp focus, high resolution 4K, detailed skin texture, professional DSLR quality. IMPORTANT: Generate a UNIQUE and DISTINCTIVE person, NOT a generic model. The model is a ${ethnicityDesc} ${isMale ? "man" : "woman"} in their ${age}, with a ${face}, ${skin}, ${build}, and a ${vibe}. The person MUST be wearing a ${clothing}. NEVER generate a bare-shouldered or unclothed model. The background should be ${backgroundDesc}. FRAMING: Upper body shot from the waist up, showing the full torso including shoulders, chest, and waist. Do NOT crop too tightly on the face. Leave enough space to show the hairstyle AND the outfit together. The hairstyle must be clearly visible and the focal point. The pose should be natural and candid like an SNS Instagram photo, not stiff or overly posed. The outfit should be trendy and fashionable, looking stylish and well-coordinated. This person has unique individual features that make them look like a real specific person (model ID: ${uniqueId}). Do NOT reuse the same face from previous generations.`;
+  return `${cleaned}. Ultra sharp focus, high resolution 2K, detailed skin texture, professional DSLR quality. IMPORTANT: Generate a UNIQUE and DISTINCTIVE person, NOT a generic model. The model is a ${ethnicityDesc} ${isMale ? "man" : "woman"} in their ${age}, with a ${face}, ${skin}, ${build}, and a ${vibe}. The person MUST be wearing a ${clothing}. NEVER generate a bare-shouldered or unclothed model. The background should be ${backgroundDesc}. FRAMING: Upper body shot from the waist up, showing the full torso including shoulders, chest, and waist. Do NOT crop too tightly on the face. Leave enough space to show the hairstyle AND the outfit together. The hairstyle must be clearly visible and the focal point. The pose should be natural and candid like an SNS Instagram photo, not stiff or overly posed. The outfit should be trendy and fashionable, looking stylish and well-coordinated. This person has unique individual features that make them look like a real specific person (model ID: ${uniqueId}). Do NOT reuse the same face from previous generations.`;
 }
 
 function extractImageUrl(choice: any): string | null {
@@ -158,7 +158,7 @@ serve(async (req) => {
               { type: "image_url", image_url: { url: currentReference } },
               {
                 type: "text",
-                text: `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. Ultra sharp focus, high resolution 4K, detailed skin texture, professional DSLR quality. IMPORTANT: Frame as an upper body shot from waist up, showing the full torso to clearly showcase both the hairstyle and outfit. The hairstyle must be the focal point. The person MUST be wearing appropriate clothing at all times. Keep the same background atmosphere. The pose should be natural and candid like an SNS photo. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes.${copyrightInstruction}`,
+                text: `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. Ultra sharp focus, high resolution 2K, detailed skin texture, professional DSLR quality. IMPORTANT: Frame as an upper body shot from waist up, showing the full torso to clearly showcase both the hairstyle and outfit. The hairstyle must be the focal point. The person MUST be wearing appropriate clothing at all times. Keep the same background atmosphere. The pose should be natural and candid like an SNS photo. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes.${copyrightInstruction}`,
               },
             ],
           },
@@ -169,7 +169,7 @@ serve(async (req) => {
         messages = [
           {
             role: "user",
-            content: `Generate a photorealistic hair model image: ${variedPrompt}. Ultra sharp focus, high resolution 4K, detailed skin texture, professional DSLR quality. FRAMING: Upper body shot from waist up, showing full torso including shoulders, chest, and waist. Do NOT crop too tightly on the face. The image should look like a stylish SNS Instagram photo with ${bgDesc}. The pose should be natural and candid, not stiff. The outfit should be trendy and well-coordinated.${copyrightInstruction}`,
+            content: `Generate a photorealistic hair model image: ${variedPrompt}. Ultra sharp focus, high resolution 2K, detailed skin texture, professional DSLR quality. FRAMING: Upper body shot from waist up, showing full torso including shoulders, chest, and waist. Do NOT crop too tightly on the face. The image should look like a stylish SNS Instagram photo with ${bgDesc}. The pose should be natural and candid, not stiff. The outfit should be trendy and well-coordinated.${copyrightInstruction}`,
           },
         ];
       }
