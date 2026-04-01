@@ -91,7 +91,7 @@ const femaleColors: HairStyle[] = [
   name,
   gender: 'female',
   category: 'color',
-  prompt: `A professional Korean female hair model with ${name} hair color, beautiful color tones, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
+  prompt: `${FEMALE_PERSONA} She has ${name} hair color, beautiful color tones, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
 }));
 
 export const allStyles: HairStyle[] = [
