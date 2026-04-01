@@ -169,7 +169,7 @@ serve(async (req) => {
         messages = [
           {
             role: "user",
-            content: `Generate a photorealistic hair model image: ${variedPrompt}. FRAMING: Upper body shot from waist up, showing full torso including shoulders, chest, and waist. Do NOT crop too tightly on the face. The image should look like a stylish SNS Instagram photo with ${bgDesc}. The pose should be natural and candid, not stiff. The outfit should be trendy and well-coordinated.${copyrightInstruction}`,
+            content: `Generate a photorealistic hair model image: ${variedPrompt}. Ultra sharp focus, high resolution 4K, detailed skin texture, professional DSLR quality. FRAMING: Upper body shot from waist up, showing full torso including shoulders, chest, and waist. Do NOT crop too tightly on the face. The image should look like a stylish SNS Instagram photo with ${bgDesc}. The pose should be natural and candid, not stiff. The outfit should be trendy and well-coordinated.${copyrightInstruction}`,
           },
         ];
       }
