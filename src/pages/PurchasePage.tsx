@@ -239,8 +239,8 @@ const PurchasePage = () => {
             {/* 안내 */}
             <div className="bg-primary/10 rounded-2xl p-5 mb-5">
               <p className="text-[15px] font-bold text-foreground leading-relaxed">
-                🎫 뽑기권 1장을 사용하면 마음에 쏙 드는<br />
-                상세 사진을 생성할 수 있어요!
+                🎫 뽑기권 1장을 사용하면 지금 보이는 사진을<br />
+                워터마크 제거하고 다운 받으실 수 있어요!
               </p>
             </div>
 
