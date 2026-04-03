@@ -254,7 +254,7 @@ const PurchasePage = () => {
 
             {/* 포함 이미지 목록 */}
             <div className="bg-card rounded-2xl border border-border p-5 mb-5">
-              <p className="text-[15px] font-bold text-foreground mb-4">포함된 이미지 5장</p>
+              <p className="text-[15px] font-bold text-foreground mb-4">포함된 이미지</p>
               <div className="flex flex-col gap-3">
                 {allShotLabels.map((shot, i) => (
                   <div key={i} className="flex items-start gap-3">
