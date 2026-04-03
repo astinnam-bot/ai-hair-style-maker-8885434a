@@ -215,7 +215,7 @@ const PurchasePage = () => {
             <div className="bg-secondary rounded-2xl p-4">
               <p className="text-[13px] text-foreground font-semibold mb-1">✅ 이미지가 생성되었어요</p>
               <p className="text-[12px] text-muted-foreground">
-                {style.name} 스타일의 상세 5장이 생성되었어요.
+                {style.name} 스타일의 상세 이미지가 생성되었어요.
                 고화질 워터마크 없는 이미지를 확인해 보세요.
               </p>
             </div>
