@@ -140,7 +140,7 @@ const PurchasePage = () => {
             <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
             <p className="text-[16px] font-bold text-foreground mb-2">이미지 생성 중...</p>
             <p className="text-[14px] text-muted-foreground text-center">
-              고화질 상세 5장을 생성하고 있어요.<br />잠시만 기다려 주세요.
+              고화질 상세 이미지를 생성하고 있어요.<br />잠시만 기다려 주세요.
             </p>
           </div>
         ) : isCompleted ? (
