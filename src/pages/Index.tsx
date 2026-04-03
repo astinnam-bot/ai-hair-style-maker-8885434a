@@ -59,9 +59,6 @@ const Index = () => {
           <div className="rounded-2xl overflow-hidden border border-border mb-4">
             <img src={sampleGrid} alt="다양한 헤어스타일 샘플" className="w-full object-cover" />
           </div>
-          <div className="rounded-2xl overflow-hidden border border-border">
-            <img src={sample4cut} alt="4컷 상세 샘플" className="w-full object-cover" />
-          </div>
         </div>
 
         <div className="mt-6 bg-secondary rounded-2xl p-5">
