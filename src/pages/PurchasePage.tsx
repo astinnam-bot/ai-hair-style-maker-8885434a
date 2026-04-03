@@ -101,7 +101,7 @@ const PurchasePage = () => {
       setGeneratedImages(mergedUrl ? [...images, mergedUrl] : images);
 
       consumeTicket();
-      toast({ title: '🎉 이미지 생성 완료!', description: '상세 5장이 준비되었어요.' });
+      toast({ title: '🎉 이미지 생성 완료!', description: '상세 이미지가 준비되었어요.' });
     } catch (err: any) {
       toast({
         title: '이미지 생성 실패',
@@ -140,7 +140,7 @@ const PurchasePage = () => {
             <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
             <p className="text-[16px] font-bold text-foreground mb-2">이미지 생성 중...</p>
             <p className="text-[14px] text-muted-foreground text-center">
-              고화질 상세 5장을 생성하고 있어요.<br />잠시만 기다려 주세요.
+              고화질 상세 이미지를 생성하고 있어요.<br />잠시만 기다려 주세요.
             </p>
           </div>
         ) : isCompleted ? (
@@ -215,7 +215,7 @@ const PurchasePage = () => {
             <div className="bg-secondary rounded-2xl p-4">
               <p className="text-[13px] text-foreground font-semibold mb-1">✅ 이미지가 생성되었어요</p>
               <p className="text-[12px] text-muted-foreground">
-                {style.name} 스타일의 상세 5장이 생성되었어요.
+                {style.name} 스타일의 상세 이미지가 생성되었어요.
                 고화질 워터마크 없는 이미지를 확인해 보세요.
               </p>
             </div>
@@ -240,7 +240,7 @@ const PurchasePage = () => {
             <div className="bg-primary/10 rounded-2xl p-5 mb-5">
               <p className="text-[15px] font-bold text-foreground leading-relaxed">
                 🎫 뽑기권 1장을 사용하면 마음에 쏙 드는<br />
-                상세 5장의 사진을 생성할 수 있어요!
+                상세 사진을 생성할 수 있어요!
               </p>
             </div>
 
@@ -254,7 +254,7 @@ const PurchasePage = () => {
 
             {/* 포함 이미지 목록 */}
             <div className="bg-card rounded-2xl border border-border p-5 mb-5">
-              <p className="text-[15px] font-bold text-foreground mb-4">포함된 이미지 5장</p>
+              <p className="text-[15px] font-bold text-foreground mb-4">포함된 이미지</p>
               <div className="flex flex-col gap-3">
                 {allShotLabels.map((shot, i) => (
                   <div key={i} className="flex items-start gap-3">
