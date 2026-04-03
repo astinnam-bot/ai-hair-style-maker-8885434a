@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { Scissors } from 'lucide-react';
-import sample4cut from '@/assets/sample-4cut.jpg';
+
 import sampleGrid from '@/assets/sample-grid.webp';
 import TicketBanner from '@/components/TicketBanner';
 
@@ -58,9 +58,6 @@ const Index = () => {
           <p className="text-sm font-semibold text-foreground mb-3">📸 샘플 이미지</p>
           <div className="rounded-2xl overflow-hidden border border-border mb-4">
             <img src={sampleGrid} alt="다양한 헤어스타일 샘플" className="w-full object-cover" />
-          </div>
-          <div className="rounded-2xl overflow-hidden border border-border">
-            <img src={sample4cut} alt="4컷 상세 샘플" className="w-full object-cover" />
           </div>
         </div>
 
