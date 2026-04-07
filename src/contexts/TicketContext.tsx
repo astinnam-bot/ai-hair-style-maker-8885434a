@@ -23,7 +23,7 @@ const TicketContext = createContext<TicketContextType>({
 export const useTicket = () => useContext(TicketContext);
 
 export const TicketProvider = ({ children }: { children: ReactNode }) => {
-  const [ticketCount, setTicketCount] = useState(0);
+  const [ticketCount, setTicketCount] = useState(1); // 테스트용 1장 발행
   const [isRecovering, setIsRecovering] = useState(false);
 
   const hasTicket = ticketCount > 0;
