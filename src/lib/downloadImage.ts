@@ -5,52 +5,25 @@
  * 3) 웹뷰에서 a.download가 무시되는 경우를 위해 blob URL을 새 탭에서 열기
  */
 export async function downloadImage(url: string, filename: string) {
+  const isWebView = /TOSS|tossapp|wv|WebView/i.test(navigator.userAgent);
+
+  if (isWebView) {
+    // 웹뷰: 원본 URL을 직접 새 탭으로 열어 길게 눌러 저장하도록 유도
+    window.open(url, '_blank');
+    return;
+  }
+
   try {
     const response = await fetch(url);
     const blob = await response.blob();
     const blobUrl = URL.createObjectURL(blob);
-
-    // 모바일 웹뷰에서는 a.download가 동작하지 않는 경우가 많으므로
-    // 새 탭에서 blob URL을 열어 사용자가 길게 눌러 저장할 수 있게 함
-    const isWebView = /TOSS|tossapp|wv|WebView/i.test(navigator.userAgent);
-
-    if (isWebView) {
-      // 웹뷰: 새 창에서 이미지를 열어 사용자가 직접 저장
-      const w = window.open('', '_blank');
-      if (w) {
-        w.document.write(`
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>${filename}</title>
-            <style>
-              body { margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #000; }
-              img { max-width: 100%; max-height: 80vh; object-fit: contain; }
-              p { color: #fff; font-size: 14px; margin-top: 16px; text-align: center; font-family: sans-serif; }
-            </style>
-          </head>
-          <body>
-            <img src="${blobUrl}" alt="${filename}" />
-            <p>이미지를 길게 눌러 저장하세요 📥</p>
-          </body>
-          </html>
-        `);
-        w.document.close();
-      } else {
-        // 팝업 차단 시 직접 이동
-        window.location.href = blobUrl;
-      }
-    } else {
-      // 일반 브라우저: a.download 사용
-      const a = document.createElement('a');
-      a.href = blobUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
-    }
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
   } catch {
     window.open(url, '_blank');
   }
@@ -100,34 +73,22 @@ export async function downloadImageWithWatermark(url: string, filename: string, 
 
     canvas.toBlob((blob) => {
       if (!blob) return;
-      const blobUrl = URL.createObjectURL(blob);
 
       const isWebView = /TOSS|tossapp|wv|WebView/i.test(navigator.userAgent);
       if (isWebView) {
-        const w = window.open('', '_blank');
-        if (w) {
-          w.document.write(`
-            <!DOCTYPE html><html><head>
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <style>body{margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:#000}img{max-width:100%;max-height:80vh;object-fit:contain}p{color:#fff;font-size:14px;margin-top:16px;text-align:center;font-family:sans-serif}</style>
-            </head><body>
-            <img src="${blobUrl}" alt="${filename}" />
-            <p>이미지를 길게 눌러 저장하세요 📥</p>
-            </body></html>
-          `);
-          w.document.close();
-        } else {
-          window.location.href = blobUrl;
-        }
-      } else {
-        const a = document.createElement("a");
-        a.href = blobUrl;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+        return;
       }
+
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
     }, "image/jpeg", 0.92);
   } catch {
     window.open(url, "_blank");
