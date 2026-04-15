@@ -23,6 +23,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/index.html" element={<Navigate to="/" replace />} />
           <Route path="/category/:gender" element={<CategoryPage />} />
           <Route path="/styles/:gender/:category" element={<StyleListPage />} />
           <Route path="/generate/:styleId" element={<GeneratePage />} />
