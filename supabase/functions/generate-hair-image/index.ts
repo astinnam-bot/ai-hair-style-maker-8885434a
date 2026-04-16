@@ -11,16 +11,19 @@ const MJ_BASE = "https://api.cometapi.com";
 
 function getSeasonalClothing(isMale: boolean): string {
   const month = new Date().getMonth() + 1;
+  // 뮤트톤 단색 의상, 헤어가 돋보이도록 심플하게
+  const mutedColors = pickRandom(["ivory", "cream", "beige", "oatmeal", "light gray", "olive", "dusty pink", "muted brown", "warm taupe", "soft khaki"]);
+
   if (isMale) {
-    if (month >= 3 && month <= 5) return pickRandom(["light linen shirt", "thin cotton sweater over a collared shirt", "casual spring jacket with a t-shirt", "knit polo shirt", "denim jacket over a henley"]);
-    if (month >= 6 && month <= 8) return pickRandom(["crisp white short-sleeve shirt", "breathable linen camp collar shirt", "casual cotton polo", "lightweight henley t-shirt", "relaxed fit crew neck tee"]);
-    if (month >= 9 && month <= 11) return pickRandom(["wool crew-neck sweater", "layered flannel shirt", "corduroy jacket over a turtleneck", "knit cardigan over a shirt", "suede bomber jacket with a t-shirt"]);
-    return pickRandom(["chunky knit turtleneck sweater", "wool overcoat over a button-up shirt", "cashmere crew-neck sweater", "padded vest over a hoodie", "heavy knit cable sweater"]);
+    if (month >= 3 && month <= 5) return pickRandom([`${mutedColors} thin cotton crew-neck sweater`, `${mutedColors} simple knit polo shirt`, `${mutedColors} lightweight mock-neck top`, `${mutedColors} minimal linen shirt`]);
+    if (month >= 6 && month <= 8) return pickRandom([`${mutedColors} simple crew-neck t-shirt`, `${mutedColors} minimal ribbed t-shirt`, `${mutedColors} clean cotton henley`, `${mutedColors} basic round-neck tee`]);
+    if (month >= 9 && month <= 11) return pickRandom([`${mutedColors} simple turtleneck sweater`, `${mutedColors} minimal crew-neck knit`, `${mutedColors} clean mock-neck sweater`, `${mutedColors} basic wool sweater`]);
+    return pickRandom([`${mutedColors} chunky turtleneck sweater`, `${mutedColors} thick crew-neck knit sweater`, `${mutedColors} cable-knit turtleneck`, `${mutedColors} cashmere mock-neck sweater`]);
   }
-  if (month >= 3 && month <= 5) return pickRandom(["tailored cropped blazer over a silk camisole", "light cardigan over a camisole", "minimal knit top with clean lines", "denim jacket over a fitted turtleneck", "structured linen blouse"]);
-  if (month >= 6 && month <= 8) return pickRandom(["off-shoulder blouse", "sleek satin camisole top", "minimal ribbed knit top", "sleeveless mock-neck top", "elegant linen wrap top"]);
-  if (month >= 9 && month <= 11) return pickRandom(["cozy knit sweater", "trench coat over a blouse", "turtleneck with a blazer", "chunky cardigan", "suede jacket over a fitted top"]);
-  return pickRandom(["cashmere turtleneck", "wool coat over a knit dress", "faux fur collar coat over a blouse", "thick cable-knit sweater", "padded jacket with a scarf"]);
+  if (month >= 3 && month <= 5) return pickRandom([`${mutedColors} simple mock-neck knit top`, `${mutedColors} minimal ribbed long-sleeve top`, `${mutedColors} clean turtleneck top`, `${mutedColors} soft off-shoulder knit top`]);
+  if (month >= 6 && month <= 8) return pickRandom([`${mutedColors} sleeveless mock-neck top`, `${mutedColors} minimal off-shoulder top`, `${mutedColors} simple cold-shoulder knit top`, `${mutedColors} clean ribbed sleeveless top`]);
+  if (month >= 9 && month <= 11) return pickRandom([`${mutedColors} simple turtleneck sweater`, `${mutedColors} off-shoulder chunky knit`, `${mutedColors} minimal crew-neck sweater`, `${mutedColors} soft mock-neck knit`]);
+  return pickRandom([`${mutedColors} chunky off-shoulder knit sweater`, `${mutedColors} thick turtleneck sweater`, `${mutedColors} cable-knit off-shoulder top`, `${mutedColors} cashmere turtleneck`]);
 }
 
 function pickRandom<T>(arr: T[]): T {
