@@ -12,13 +12,28 @@ const MJ_BASE = "https://api.cometapi.com";
 function getSeasonalClothing(isMale: boolean): string {
   const month = new Date().getMonth() + 1;
   // 뮤트톤 단색 의상, 헤어가 돋보이도록 심플하게
+  // 남성: 레퍼런스 이미지 기반 의상 (블랙 티, 그레이 맨투맨, 브라운 롱슬리브, 블랙 집업, 아이보리 셔츠, 블랙 니트, 토프 니트)
+  const maleClothing = [
+    "black simple crew-neck t-shirt",
+    "charcoal gray oversized sweatshirt",
+    "dark brown long-sleeve crew-neck shirt",
+    "black zip-up jacket over white crew-neck tee",
+    "ivory cotton button-down shirt with collar",
+    "black fine-knit crew-neck sweater",
+    "warm taupe crew-neck knit sweater",
+    "oatmeal minimal crew-neck t-shirt",
+    "muted brown relaxed-fit long-sleeve top",
+    "dark navy simple crew-neck sweater",
+  ];
+
+  // 여성: 뮤트톤 단색 의상
   const mutedColors = pickRandom(["ivory", "cream", "beige", "oatmeal", "light gray", "olive", "dusty pink", "muted brown", "warm taupe", "soft khaki"]);
 
   if (isMale) {
-    if (month >= 3 && month <= 5) return pickRandom([`${mutedColors} thin cotton crew-neck sweater`, `${mutedColors} simple knit polo shirt`, `${mutedColors} lightweight mock-neck top`, `${mutedColors} minimal linen shirt`]);
-    if (month >= 6 && month <= 8) return pickRandom([`${mutedColors} simple crew-neck t-shirt`, `${mutedColors} minimal ribbed t-shirt`, `${mutedColors} clean cotton henley`, `${mutedColors} basic round-neck tee`]);
-    if (month >= 9 && month <= 11) return pickRandom([`${mutedColors} simple turtleneck sweater`, `${mutedColors} minimal crew-neck knit`, `${mutedColors} clean mock-neck sweater`, `${mutedColors} basic wool sweater`]);
-    return pickRandom([`${mutedColors} chunky turtleneck sweater`, `${mutedColors} thick crew-neck knit sweater`, `${mutedColors} cable-knit turtleneck`, `${mutedColors} cashmere mock-neck sweater`]);
+    if (month >= 3 && month <= 5) return pickRandom(maleClothing);
+    if (month >= 6 && month <= 8) return pickRandom(["black simple crew-neck t-shirt", "charcoal gray crew-neck t-shirt", "oatmeal minimal crew-neck t-shirt", "white basic round-neck tee"]);
+    if (month >= 9 && month <= 11) return pickRandom(maleClothing);
+    return pickRandom(["black fine-knit crew-neck sweater", "warm taupe crew-neck knit sweater", "charcoal gray oversized sweatshirt", "dark brown long-sleeve crew-neck shirt", "black zip-up jacket over white crew-neck tee"]);
   }
   if (month >= 3 && month <= 5) return pickRandom([`${mutedColors} simple mock-neck knit top`, `${mutedColors} minimal ribbed long-sleeve top`, `${mutedColors} clean turtleneck top`, `${mutedColors} soft off-shoulder knit top`]);
   if (month >= 6 && month <= 8) return pickRandom([`${mutedColors} sleeveless mock-neck top`, `${mutedColors} minimal off-shoulder top`, `${mutedColors} simple cold-shoulder knit top`, `${mutedColors} clean ribbed sleeveless top`]);
@@ -41,9 +56,11 @@ function buildMjPrompt(basePrompt: string, bgPrompt?: string): string {
     return `${basePrompt}. A candid photo taken with a Canon EOS R5, 85mm f/1.4 lens, of a real young Korean woman at a hair salon. Shot looks like it was taken by a hairstylist to showcase the haircut. She has minimal no-makeup makeup, natural dewy skin with visible pores and slight skin texture, coral tinted lip balm. Her expression is calm and slightly shy, not posing - just standing naturally as if the stylist said "let me take a quick photo." She wears a ${clothing}. Background is ${backgroundDesc}. Natural window light from the side, no studio lighting, no retouching. Slight lens imperfections, natural color grading like an iPhone photo. The hairstyle is the focal point. Upper body from chest up. No hands near head or hair. NOT AI generated, NOT illustration, NOT 3D render, NOT perfect skin --ar 4:5 --v 6.1 --style raw --q 2 --s 50`;
   }
 
-  // 남성
-  const backgroundDesc = bgPrompt || "a plain light gray concrete wall, slightly textured";
-  return `${basePrompt}. A candid photo taken with a Canon EOS R5, 85mm f/1.4 lens, of a real young Korean man at a hair salon. Shot looks like it was taken by a hairstylist to showcase the haircut. He has clean natural skin with visible pores and slight skin texture. His expression is calm and relaxed, looking slightly away from camera - just standing naturally as if the stylist said "let me take a quick photo." He wears a ${clothing}. Background is ${backgroundDesc}. Natural window light from the side, no studio lighting, no retouching. Slight lens imperfections, natural color grading like an iPhone photo. The hairstyle is the focal point. Upper body from chest up. No hands near head or hair. NOT AI generated, NOT illustration, NOT 3D render, NOT perfect skin --ar 4:5 --v 6.1 --style raw --q 2 --s 50`;
+  // 남성 - 레퍼런스 이미지 기반: 자연스러운 피부, 약간의 잡티, 무표정~살짝 미소, 다양한 시선 방향
+  const backgroundDesc = bgPrompt || "a plain matte white wall, clean and minimal";
+  const maleGaze = pickRandom(["looking slightly to the left", "looking slightly to the right", "gazing slightly downward to the side", "looking past the camera with a calm expression"]);
+  const maleExpression = pickRandom(["calm neutral expression with lips gently closed", "subtle gentle half-smile", "relaxed soft expression", "calm and slightly shy expression"]);
+  return `${basePrompt}. A candid photo taken with a Canon EOS R5, 85mm f/1.4 lens, of a real young Korean man in his early 20s at a hair salon. Shot looks like it was taken by a hairstylist to showcase the haircut. He has clean natural skin with visible pores, slight blemishes, and natural skin texture - NOT airbrushed, NOT flawless. ${maleExpression}, ${maleGaze} - NOT staring directly at camera. He wears a ${clothing}. Background is ${backgroundDesc}. Natural soft daylight, no studio lighting, no retouching. Slight lens imperfections, natural color grading like an iPhone photo. The hairstyle is the focal point. Upper body from chest up. No hands near head or hair. NOT AI generated, NOT illustration, NOT 3D render, NOT perfect porcelain skin --ar 4:5 --v 6.1 --style raw --q 2 --s 50`;
 }
 
 // Poll MJ task until SUCCESS or failure
