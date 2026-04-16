@@ -34,14 +34,13 @@ function buildMjPrompt(basePrompt: string, bgPrompt?: string): string {
   const clothing = getSeasonalClothing(isMale);
 
   if (isFemale) {
-    // 여성 전용 고정 프롬프트
-    const backgroundDesc = bgPrompt || "a normal, bright matte white wall";
-    return `${basePrompt}. A high resolution photo of a young, sophisticated Korean woman. She has subtle and natural makeup with bright, dewy 'glass skin' and coral pink lips. With a sophisticated and slightly chic look, she is natural without facing the camera herself. She wears a ${clothing} and a collarbone background is ${backgroundDesc}. The lighting is soft and diffused to create a luxurious and neat K-beauty lookbook aesthetic. Filming at eye level with a subtle bokeh effect. The hairstyle is the focal point, clearly visible. Upper body shot from waist up. No hands near head or hair --ar 4:5 --v 6.1 --style raw --q 2`;
+    const backgroundDesc = bgPrompt || "a plain light gray concrete wall, slightly textured";
+    return `${basePrompt}. A candid photo taken with a Canon EOS R5, 85mm f/1.4 lens, of a real young Korean woman at a hair salon. Shot looks like it was taken by a hairstylist to showcase the haircut. She has minimal no-makeup makeup, natural dewy skin with visible pores and slight skin texture, coral tinted lip balm. Her expression is calm and slightly shy, not posing - just standing naturally as if the stylist said "let me take a quick photo." She wears a ${clothing}. Background is ${backgroundDesc}. Natural window light from the side, no studio lighting, no retouching. Slight lens imperfections, natural color grading like an iPhone photo. The hairstyle is the focal point. Upper body from chest up. No hands near head or hair. NOT AI generated, NOT illustration, NOT 3D render, NOT perfect skin --ar 4:5 --v 6.1 --style raw --q 2 --s 50`;
   }
 
-  // 남성 전용 고정 프롬프트
-  const backgroundDesc = bgPrompt || "a normal, bright matte white wall";
-  return `${basePrompt}. A high resolution photo of a young and sophisticated Korean male hair model. He has clean and shiny 'glass skin' and subtle and natural makeup. With a soft body, it flows gracefully in and out of the ear. He is natural without staring directly at the camera with a calm and cool expression. He is wearing a ${clothing}. The background is ${backgroundDesc}. The lighting is soft and diffused to create a luxurious and neat K-beauty lookbook aesthetic. It was shot from the eye level with a subtle bokeh effect. The hairstyle is the focal point, clearly visible. Upper body shot from waist up. No hands near head or hair --ar 4:5 --v 6.1 --style raw --q 2`;
+  // 남성
+  const backgroundDesc = bgPrompt || "a plain light gray concrete wall, slightly textured";
+  return `${basePrompt}. A candid photo taken with a Canon EOS R5, 85mm f/1.4 lens, of a real young Korean man at a hair salon. Shot looks like it was taken by a hairstylist to showcase the haircut. He has clean natural skin with visible pores and slight skin texture. His expression is calm and relaxed, looking slightly away from camera - just standing naturally as if the stylist said "let me take a quick photo." He wears a ${clothing}. Background is ${backgroundDesc}. Natural window light from the side, no studio lighting, no retouching. Slight lens imperfections, natural color grading like an iPhone photo. The hairstyle is the focal point. Upper body from chest up. No hands near head or hair. NOT AI generated, NOT illustration, NOT 3D render, NOT perfect skin --ar 4:5 --v 6.1 --style raw --q 2 --s 50`;
 }
 
 // Poll MJ task until SUCCESS or failure
