@@ -1,4 +1,4 @@
-// Hair image generation using CometAPI Gemini (gemini-3.1-flash-image-preview)
+// Hair image generation using CometAPI Midjourney API (/mj/submit/imagine + polling)
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -6,6 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+const MJ_BASE = "https://api.cometapi.com";
 
 function getSeasonalClothing(isMale: boolean): string {
   const month = new Date().getMonth() + 1;
@@ -15,98 +17,97 @@ function getSeasonalClothing(isMale: boolean): string {
     if (month >= 9 && month <= 11) return pickRandom(["wool crew-neck sweater", "layered flannel shirt", "corduroy jacket over a turtleneck", "knit cardigan over a shirt", "suede bomber jacket with a t-shirt"]);
     return pickRandom(["chunky knit turtleneck sweater", "wool overcoat over a button-up shirt", "cashmere crew-neck sweater", "padded vest over a hoodie", "heavy knit cable sweater"]);
   }
-
   if (month >= 3 && month <= 5) return pickRandom(["tailored cropped blazer over a silk camisole", "light cardigan over a camisole", "minimal knit top with clean lines", "denim jacket over a fitted turtleneck", "structured linen blouse"]);
   if (month >= 6 && month <= 8) return pickRandom(["off-shoulder blouse", "sleek satin camisole top", "minimal ribbed knit top", "sleeveless mock-neck top", "elegant linen wrap top"]);
   if (month >= 9 && month <= 11) return pickRandom(["cozy knit sweater", "trench coat over a blouse", "turtleneck with a blazer", "chunky cardigan", "suede jacket over a fitted top"]);
   return pickRandom(["cashmere turtleneck", "wool coat over a knit dress", "faux fur collar coat over a blouse", "thick cable-knit sweater", "padded jacket with a scarf"]);
 }
 
-const modelTraits = {
-  male: {
-    ages: ["early 20s", "mid 20s", "late 20s"],
-    faces: ["round face shape", "oval face shape", "square jawline", "angular face with high cheekbones", "soft diamond-shaped face"],
-    skins: ["fair skin", "light tan skin", "warm medium skin tone", "slightly tanned skin"],
-    builds: ["slim build", "average build", "athletic muscular build", "broad-shouldered build"],
-    vibes: ["calm relaxed expression", "confident sharp gaze", "friendly warm smile", "serious editorial expression", "playful youthful look"],
-  },
-  female: {
-    ages: ["early 20s", "mid 20s", "late 20s"],
-    faces: ["round soft face", "oval face shape", "heart-shaped face", "V-line jawline", "small delicate face with high cheekbones"],
-    skins: ["porcelain fair skin", "light natural skin", "warm honey skin tone", "slightly tanned glowing skin"],
-    builds: ["slim petite build", "average build", "tall slender build"],
-    vibes: ["elegant poised expression", "cute bright smile", "chic cool gaze", "natural effortless look", "dreamy soft expression"],
-  },
-};
-
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function cleanBasePrompt(prompt: string): string {
-  return prompt
-    .replace(/studio lighting/gi, "natural warm lighting")
-    .replace(/bright sheer curtain background/gi, "")
-    .replace(/clean background/gi, "");
-}
-
-function buildVarietyPrompt(basePrompt: string, bgPrompt?: string): string {
+function buildMjPrompt(basePrompt: string, bgPrompt?: string): string {
   const backgroundDesc = bgPrompt || "cozy stylish cafe atmosphere with warm ambient lighting";
-  const cleaned = cleanBasePrompt(basePrompt);
-  const lowerPrompt = cleaned.toLowerCase();
+  const lowerPrompt = basePrompt.toLowerCase();
   const isFemale = lowerPrompt.includes("female") || lowerPrompt.includes("woman") || lowerPrompt.includes("여성");
   const isMale = !isFemale;
-  const traits = isMale ? modelTraits.male : modelTraits.female;
+
+  const traits = isMale
+    ? { ages: ["early 20s", "mid 20s", "late 20s"], faces: ["round face", "oval face", "square jawline", "angular face"], skins: ["fair skin", "light tan skin", "warm medium skin"], builds: ["slim build", "average build", "athletic build"], vibes: ["calm relaxed", "confident gaze", "friendly smile", "serious editorial"] }
+    : { ages: ["early 20s", "mid 20s", "late 20s"], faces: ["round soft face", "oval face", "heart-shaped face", "V-line jaw"], skins: ["porcelain fair skin", "light natural skin", "warm honey skin"], builds: ["slim petite build", "average build", "tall slender build"], vibes: ["elegant poised", "cute bright smile", "chic cool gaze", "natural effortless"] };
+
   const age = pickRandom(traits.ages);
   const face = pickRandom(traits.faces);
   const skin = pickRandom(traits.skins);
   const build = pickRandom(traits.builds);
   const vibe = pickRandom(traits.vibes);
-  const uniqueId = Math.random().toString(36).substring(2, 8);
   const clothing = getSeasonalClothing(isMale);
   const isWestern = lowerPrompt.includes("western") || lowerPrompt.includes("caucasian") || lowerPrompt.includes("foreign");
   const ethnicityDesc = isWestern ? "Western Caucasian" : "Korean";
 
-  return `${cleaned}. Ultra sharp focus, high resolution 2K, detailed skin texture, professional DSLR quality. IMPORTANT: Generate a UNIQUE and DISTINCTIVE person, NOT a generic model. The model is a ${ethnicityDesc} ${isMale ? "man" : "woman"} in their ${age}, with a ${face}, ${skin}, ${build}, and a ${vibe}. The person MUST be wearing a ${clothing}. NEVER generate a bare-shouldered or unclothed model. The background should be ${backgroundDesc}. FRAMING: Upper body shot from the waist up, showing the full torso including shoulders, chest, and waist. Do NOT crop too tightly on the face. Leave enough space to show the hairstyle AND the outfit together. The hairstyle must be clearly visible and the focal point. The pose should be natural and candid like an SNS Instagram photo, not stiff or overly posed. The outfit should be trendy and fashionable, looking stylish and well-coordinated. This person has unique individual features that make them look like a real specific person (model ID: ${uniqueId}). Do NOT reuse the same face from previous generations. CRITICAL: The person must NEVER touch their hair or head with their hands. Hands must be kept away from the head and hair at all times. No hands near the face or hair.`;
+  return `${basePrompt}, photorealistic portrait of a ${ethnicityDesc} ${isMale ? "man" : "woman"} in their ${age}, ${face}, ${skin}, ${build}, ${vibe} expression, wearing ${clothing}, ${backgroundDesc} background, upper body shot from waist up, professional DSLR quality, ultra sharp focus, detailed skin texture, natural candid Instagram SNS pose, hairstyle is the focal point, no hands near head or hair --ar 1:1 --v 6.1 --style raw --q 2`;
 }
 
-function extractImageUrl(choice: any): string | null {
-  if (choice?.images?.[0]?.image_url?.url) return choice.images[0].image_url.url;
-  if (!choice?.content) return null;
-  if (Array.isArray(choice.content)) {
-    const imgPart = choice.content.find((p: any) => p.type === "image_url" || p.type === "image");
-    if (imgPart?.image_url?.url) return imgPart.image_url.url;
-    if (imgPart?.url) return imgPart.url;
-    return null;
+// Poll MJ task until SUCCESS or failure
+async function pollTask(taskId: string, apiKey: string, maxWaitMs = 120000): Promise<{ imageUrl: string; buttons: any[] }> {
+  const startTime = Date.now();
+  const pollInterval = 3000; // 3 seconds
+
+  while (Date.now() - startTime < maxWaitMs) {
+    const resp = await fetch(`${MJ_BASE}/mj/task/${taskId}/fetch`, {
+      headers: { "Authorization": `Bearer ${apiKey}` },
+    });
+
+    if (!resp.ok) {
+      const body = await resp.text();
+      console.error(`Poll error [${resp.status}]:`, body);
+      throw new Error(`폴링 실패: ${resp.status}`);
+    }
+
+    const task = await resp.json();
+    console.log(`Task ${taskId} status: ${task.status}, progress: ${task.progress || "N/A"}`);
+
+    if (task.status === "SUCCESS") {
+      return { imageUrl: task.imageUrl, buttons: task.buttons || [] };
+    }
+    if (task.status === "FAILURE" || task.status === "CANCEL") {
+      throw new Error(task.failReason || "이미지 생성에 실패했어요.");
+    }
+
+    // Wait before next poll
+    await new Promise((r) => setTimeout(r, pollInterval));
   }
-  if (typeof choice.content !== "string") return null;
-  const content = choice.content;
-  if (content.startsWith("data:image")) return content;
-  const dataIdx = content.indexOf("data:image/");
-  if (dataIdx !== -1) {
-    const closeParen = content.indexOf(")", dataIdx);
-    return closeParen !== -1 ? content.substring(dataIdx, closeParen) : content.substring(dataIdx).trim();
-  }
-  const urlMatch = content.match(/(https?:\/\/[^\s)]+\.(png|jpg|jpeg|webp)[^\s)]*)/i);
-  return urlMatch ? urlMatch[1] : null;
+
+  throw new Error("이미지 생성 시간이 초과되었어요. 다시 시도해 주세요.");
 }
 
-async function uploadToStorage(supabase: any, imageDataUrl: string, timestamp: number, index: number): Promise<string> {
-  const base64Match = imageDataUrl.match(/^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/);
-  if (base64Match) {
-    const ext = base64Match[1] === "jpeg" ? "jpg" : base64Match[1];
-    const binaryData = Uint8Array.from(atob(base64Match[2]), (c) => c.charCodeAt(0));
+// Download image from URL and upload to Supabase Storage
+async function downloadAndUpload(supabase: any, imageUrl: string, timestamp: number, index: number): Promise<string> {
+  try {
+    const imgResp = await fetch(imageUrl);
+    if (!imgResp.ok) throw new Error(`Image download failed: ${imgResp.status}`);
+    const imgBuffer = new Uint8Array(await imgResp.arrayBuffer());
+    const contentType = imgResp.headers.get("content-type") || "image/png";
+    const ext = contentType.includes("jpeg") || contentType.includes("jpg") ? "jpg" : "png";
     const filePath = `generated/${timestamp}_${index}.${ext}`;
-    const { error } = await supabase.storage.from("hair-images").upload(filePath, binaryData, {
-      contentType: `image/${base64Match[1]}`,
+
+    const { error } = await supabase.storage.from("hair-images").upload(filePath, imgBuffer, {
+      contentType,
       upsert: true,
     });
-    if (!error) {
-      const { data: urlData } = supabase.storage.from("hair-images").getPublicUrl(filePath);
-      return urlData.publicUrl;
+
+    if (error) {
+      console.error("Storage upload error:", error);
+      return imageUrl; // fallback to original URL
     }
+
+    const { data: urlData } = supabase.storage.from("hair-images").getPublicUrl(filePath);
+    return urlData.publicUrl;
+  } catch (e) {
+    console.error("downloadAndUpload error:", e);
+    return imageUrl;
   }
-  return imageDataUrl;
 }
 
 serve(async (req) => {
@@ -133,133 +134,92 @@ serve(async (req) => {
 
     const images: string[] = [];
     const timestamp = Date.now();
-    const angleDescriptions = [
-      "front view upper body shot from waist up, showing full torso and hairstyle clearly",
-      "45 degree angle side view upper body shot from waist up, showing the hairstyle from an angle",
-      "complete side profile upper body shot from waist up, showing the hairstyle silhouette",
-      "back view upper body shot from waist up, showing full hairstyle from behind",
-    ];
+    const mjPrompt = buildMjPrompt(prompt, backgroundPrompt);
 
-    let currentReference = referenceImage || null;
-    const copyrightInstruction = copyrightText
-      ? ` Add a small, elegant copyright watermark text "${copyrightText}" at the bottom center of the image in a semi-transparent white font, like a professional photo watermark.`
-      : "";
+    console.log("MJ Prompt:", mjPrompt.slice(0, 200));
 
-    for (let i = 0; i < Math.min(count, 4); i++) {
-      let contentParts: any[];
+    // Step 1: Submit imagine task
+    const submitBody: any = { prompt: mjPrompt };
 
-      if (currentReference) {
-        const refText = `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. Ultra sharp focus, detailed skin texture, professional DSLR quality. IMPORTANT: Frame as an upper body shot from waist up, showing the full torso to clearly showcase both the hairstyle and outfit. The hairstyle must be the focal point. The person MUST be wearing appropriate clothing at all times. Keep the same background atmosphere. The pose should be natural and candid like an SNS photo. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes. CRITICAL: The person must NEVER touch their hair or head with their hands. Hands must be kept away from the head and hair at all times. No hands near the face or hair.${copyrightInstruction}`;
-        const parts: any[] = [{ text: refText }];
-        const base64Match = currentReference.match(/^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/);
-
-        if (base64Match) {
-          parts.unshift({ inlineData: { mimeType: `image/${base64Match[1]}`, data: base64Match[2] } });
-        } else if (currentReference.startsWith("http")) {
-          try {
-            const imgResp = await fetch(currentReference);
-            const imgBuf = await imgResp.arrayBuffer();
-            const imgBase64 = btoa(String.fromCharCode(...new Uint8Array(imgBuf)));
-            const contentType = imgResp.headers.get("content-type") || "image/png";
-            parts.unshift({ inlineData: { mimeType: contentType, data: imgBase64 } });
-          } catch (e) {
-            console.error("Failed to fetch reference image:", e);
-            parts.unshift({ text: `[Reference image URL: ${currentReference}]` });
-          }
-        }
-
-        contentParts = parts;
-      } else {
-        const variedPrompt = buildVarietyPrompt(prompt, backgroundPrompt);
-        const promptText = `Generate a photorealistic hair model image: ${variedPrompt}. The image should look like a stylish SNS Instagram photo. The pose should be natural and candid, not stiff. The outfit should be trendy and well-coordinated.${copyrightInstruction}`;
-        contentParts = [{ text: promptText }];
-      }
-
-      let imageDataUrl: string | null = null;
-      const maxRetries = 3;
-
-      for (let attempt = 0; attempt < maxRetries; attempt++) {
+    // If reference image provided, use it as base64 array
+    if (referenceImage) {
+      submitBody.base64Array = [];
+      if (referenceImage.startsWith("data:image")) {
+        submitBody.base64Array.push(referenceImage);
+      } else if (referenceImage.startsWith("http")) {
+        // MJ API can accept base64 — fetch and convert
         try {
-          const response = await fetch("https://api.cometapi.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent", {
-            method: "POST",
-            headers: {
-              "x-goog-api-key": COMET_API_KEY,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              contents: [{ parts: contentParts }],
-              generationConfig: {
-                responseModalities: ["TEXT", "IMAGE"],
-                imageConfig: { aspectRatio: "1:1", imageSize: "1K" },
-              },
-            }),
-          });
-
-          if (!response.ok) {
-            const status = response.status;
-            const body = await response.text();
-            console.error(`Gemini API error (attempt ${attempt + 1}):`, status, body);
-            if (status === 429) {
-              return new Response(JSON.stringify({ error: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요." }), {
-                status: 429,
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
-              });
-            }
-            if (attempt < maxRetries - 1) continue;
-            return new Response(JSON.stringify({ error: "이미지 생성에 실패했습니다." }), {
-              status: 500,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
-          }
-
-          const data = await response.json();
-          const candidate = data.candidates?.[0];
-          if (candidate?.content?.parts) {
-            for (const part of candidate.content.parts) {
-              if (part.inlineData) {
-                imageDataUrl = `data:${part.inlineData.mimeType || "image/png"};base64,${part.inlineData.data}`;
-              }
-            }
-          }
-          if (!imageDataUrl) {
-            imageDataUrl = extractImageUrl(candidate?.message || candidate);
-          }
-          if (imageDataUrl) break;
-          console.error(`No image extracted (attempt ${attempt + 1}):`, JSON.stringify(data).slice(0, 500));
-        } catch (fetchErr) {
-          console.error(`Fetch error (attempt ${attempt + 1}):`, fetchErr);
-          if (attempt >= maxRetries - 1) break;
+          const imgResp = await fetch(referenceImage);
+          const imgBuf = await imgResp.arrayBuffer();
+          const imgBase64 = btoa(String.fromCharCode(...new Uint8Array(imgBuf)));
+          const contentType = imgResp.headers.get("content-type") || "image/png";
+          submitBody.base64Array.push(`data:${contentType};base64,${imgBase64}`);
+        } catch (e) {
+          console.error("Failed to fetch reference image:", e);
         }
-      }
-
-      if (imageDataUrl) {
-        if (!currentReference) currentReference = imageDataUrl;
-        try {
-          const finalUrl = await uploadToStorage(supabase, imageDataUrl, timestamp, i);
-          images.push(finalUrl);
-        } catch (uploadErr) {
-          console.error("Storage upload failed:", uploadErr);
-          images.push(imageDataUrl);
-        }
-      } else {
-        console.error("Failed to extract image after all retries for angle", i);
       }
     }
 
-    if (images.length === 0) {
-      return new Response(JSON.stringify({ error: "이미지를 생성할 수 없습니다." }), {
+    const submitResp = await fetch(`${MJ_BASE}/mj/submit/imagine`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${COMET_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(submitBody),
+    });
+
+    if (!submitResp.ok) {
+      const errBody = await submitResp.text();
+      console.error(`MJ submit error [${submitResp.status}]:`, errBody);
+      if (submitResp.status === 429) {
+        return new Response(JSON.stringify({ error: "요청이 너무 많아요. 잠시 후 다시 시도해 주세요." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ error: "이미지 생성 요청에 실패했어요." }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(JSON.stringify({ images }), {
+    const submitData = await submitResp.json();
+    console.log("Submit response:", JSON.stringify(submitData));
+
+    if (!submitData.result) {
+      return new Response(JSON.stringify({ error: submitData.description || "이미지 생성 요청에 실패했어요." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const taskId = submitData.result;
+
+    // Step 2: Poll until SUCCESS
+    const taskResult = await pollTask(taskId, COMET_API_KEY);
+    console.log("Task completed, imageUrl:", taskResult.imageUrl?.slice(0, 100));
+
+    // Step 3: Download and upload to storage
+    if (taskResult.imageUrl) {
+      const finalUrl = await downloadAndUpload(supabase, taskResult.imageUrl, timestamp, 0);
+      images.push(finalUrl);
+    }
+
+    if (images.length === 0) {
+      return new Response(JSON.stringify({ error: "이미지를 생성할 수 없어요." }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ images, taskId, buttons: taskResult.buttons }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("generate-hair-image error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "알 수 없는 오류가 발생했어요." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
