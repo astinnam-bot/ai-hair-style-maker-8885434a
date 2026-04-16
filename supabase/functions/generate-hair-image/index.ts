@@ -46,7 +46,7 @@ function buildMjPrompt(basePrompt: string, bgPrompt?: string): string {
   const isWestern = lowerPrompt.includes("western") || lowerPrompt.includes("caucasian") || lowerPrompt.includes("foreign");
   const ethnicityDesc = isWestern ? "Western Caucasian" : "Korean";
 
-  return `${basePrompt}, photorealistic portrait of a ${ethnicityDesc} ${isMale ? "man" : "woman"} in their ${age}, ${face}, ${skin}, ${build}, ${vibe} expression, wearing ${clothing}, ${backgroundDesc} background, upper body shot from waist up, professional DSLR quality, ultra sharp focus, detailed skin texture, natural candid Instagram SNS pose, hairstyle is the focal point, no hands near head or hair --ar 1:1 --v 6.1 --style raw --q 2`;
+  return `${basePrompt}, photorealistic portrait of a ${ethnicityDesc} ${isMale ? "man" : "woman"} in their ${age}, ${face}, ${skin}, ${build}, ${vibe} expression, wearing ${clothing}, ${backgroundDesc} background, upper body shot from waist up, professional DSLR quality, ultra sharp focus, detailed skin texture, natural candid Instagram SNS pose, hairstyle is the focal point, no hands near head or hair --ar 4:5 --v 6.1 --style raw --q 2`;
 }
 
 // Poll MJ task until SUCCESS or failure
