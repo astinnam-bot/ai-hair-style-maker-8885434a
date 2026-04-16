@@ -4,11 +4,18 @@
  * 2) 실패 시 window.open 으로 폴백
  * 3) 웹뷰에서 a.download가 무시되는 경우를 위해 blob URL을 새 탭에서 열기
  */
-export async function downloadImage(url: string, filename: string) {
+
+function generateRandomFilename(extension: string = 'jpg'): string {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  return `ai-hair-style-${timestamp}${random}.${extension}`;
+}
+
+export async function downloadImage(url: string, filename?: string) {
+  const finalFilename = filename || generateRandomFilename();
   const isWebView = /TOSS|tossapp|wv|WebView/i.test(navigator.userAgent);
 
   if (isWebView) {
-    // 웹뷰: 원본 URL을 직접 새 탭으로 열어 길게 눌러 저장하도록 유도
     window.open(url, '_blank');
     return;
   }
@@ -19,7 +26,7 @@ export async function downloadImage(url: string, filename: string) {
     const blobUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = blobUrl;
-    a.download = filename;
+    a.download = finalFilename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -29,7 +36,37 @@ export async function downloadImage(url: string, filename: string) {
   }
 }
 
-export async function downloadImageWithWatermark(url: string, filename: string, watermarkText: string = "HAIR MODEL AI") {
+/**
+ * Web Share API를 사용한 이미지 공유
+ * 모바일에서 카카오톡, 인스타그램 등으로 공유 가능
+ */
+export async function shareImage(url: string, title: string = 'AI 헤어 스타일') {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const file = new File([blob], generateRandomFilename('png'), { type: blob.type });
+
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      await navigator.share({
+        title,
+        text: `${title} - AI 헤어 스타일로 만든 이미지에요!`,
+        files: [file],
+      });
+      return true;
+    }
+
+    // Web Share API 미지원 시 다운로드로 폴백
+    await downloadImage(url);
+    return false;
+  } catch (e: any) {
+    if (e?.name === 'AbortError') return false; // 사용자가 공유 취소
+    await downloadImage(url);
+    return false;
+  }
+}
+
+export async function downloadImageWithWatermark(url: string, filename?: string, watermarkText: string = "HAIR MODEL AI") {
+  const finalFilename = filename || generateRandomFilename();
   try {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -84,7 +121,7 @@ export async function downloadImageWithWatermark(url: string, filename: string, 
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = blobUrl;
-      a.download = filename;
+      a.download = finalFilename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
