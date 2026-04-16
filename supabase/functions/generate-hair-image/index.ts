@@ -39,18 +39,9 @@ function buildMjPrompt(basePrompt: string, bgPrompt?: string): string {
     return `${basePrompt}. A high resolution photo of a young, sophisticated Korean woman. She has subtle and natural makeup with bright, dewy 'glass skin' and coral pink lips. With a sophisticated and slightly chic look, she is natural without facing the camera herself. She wears a ${clothing} and a collarbone background is ${backgroundDesc}. The lighting is soft and diffused to create a luxurious and neat K-beauty lookbook aesthetic. Filming at eye level with a subtle bokeh effect. The hairstyle is the focal point, clearly visible. Upper body shot from waist up. No hands near head or hair --ar 4:5 --v 6.1 --style raw --q 2`;
   }
 
-  // 남성
-  const backgroundDesc = bgPrompt || "cozy stylish cafe atmosphere with warm ambient lighting";
-  const traits = { ages: ["early 20s", "mid 20s", "late 20s"], faces: ["round face", "oval face", "square jawline", "angular face"], skins: ["fair skin", "light tan skin", "warm medium skin"], builds: ["slim build", "average build", "athletic build"], vibes: ["calm relaxed", "confident gaze", "friendly smile", "serious editorial"] };
-  const age = pickRandom(traits.ages);
-  const face = pickRandom(traits.faces);
-  const skin = pickRandom(traits.skins);
-  const build = pickRandom(traits.builds);
-  const vibe = pickRandom(traits.vibes);
-  const isWestern = lowerPrompt.includes("western") || lowerPrompt.includes("caucasian") || lowerPrompt.includes("foreign");
-  const ethnicityDesc = isWestern ? "Western Caucasian" : "Korean";
-
-  return `${basePrompt}, photorealistic portrait of a ${ethnicityDesc} man in their ${age}, ${face}, ${skin}, ${build}, ${vibe} expression, wearing ${clothing}, ${backgroundDesc} background, upper body shot from waist up, professional DSLR quality, ultra sharp focus, detailed skin texture, natural candid Instagram SNS pose, hairstyle is the focal point, no hands near head or hair --ar 4:5 --v 6.1 --style raw --q 2`;
+  // 남성 전용 고정 프롬프트
+  const backgroundDesc = bgPrompt || "a normal, bright matte white wall";
+  return `${basePrompt}. A high resolution photo of a young and sophisticated Korean male hair model. He has clean and shiny 'glass skin' and subtle and natural makeup. With a soft body, it flows gracefully in and out of the ear. He is natural without staring directly at the camera with a calm and cool expression. He is wearing a ${clothing}. The background is ${backgroundDesc}. The lighting is soft and diffused to create a luxurious and neat K-beauty lookbook aesthetic. It was shot from the eye level with a subtle bokeh effect. The hairstyle is the focal point, clearly visible. Upper body shot from waist up. No hands near head or hair --ar 4:5 --v 6.1 --style raw --q 2`;
 }
 
 // Poll MJ task until SUCCESS or failure
