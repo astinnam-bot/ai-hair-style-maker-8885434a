@@ -63,11 +63,6 @@ export const TicketProvider = ({ children }: { children: ReactNode }) => {
 
     recover();
 
-    // [개발용] 앱 진입 시 테스트 뽑기권 1매 자동 발행
-    if (import.meta.env.DEV) {
-      console.log('[TicketContext] DEV: 테스트 뽑기권 +1 발행');
-      addTickets(1);
-    }
 
     return () => { cancelled = true; };
   }, [addTickets]);
