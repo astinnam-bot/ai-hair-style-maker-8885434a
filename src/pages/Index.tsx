@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { Scissors } from 'lucide-react';
-
+import sample4cut from '@/assets/sample-4cut.jpg';
 import sampleGrid from '@/assets/sample-grid.webp';
 import TicketBanner from '@/components/TicketBanner';
 
@@ -59,6 +59,9 @@ const Index = () => {
           <div className="rounded-2xl overflow-hidden border border-border mb-4">
             <img src={sampleGrid} alt="다양한 헤어스타일 샘플" className="w-full object-cover" />
           </div>
+          <div className="rounded-2xl overflow-hidden border border-border">
+            <img src={sample4cut} alt="4컷 상세 샘플" className="w-full object-cover" />
+          </div>
         </div>
 
         <div className="mt-6 bg-secondary rounded-2xl p-5">
@@ -68,7 +71,7 @@ const Index = () => {
           </p>
           <p className="text-[13px] text-muted-foreground leading-relaxed mt-2">
              원하는 헤어스타일을 선택하면 AI가 해당 스타일의 헤어 모델 이미지를 생성해요.
-             미리보기 1장은 무료(워터마크), 결제 후 다운로드 할 수 있어요.
+             미리보기 1장은 무료(워터마크), 상세 4컷은 결제 후 확인할 수 있어요.
           </p>
         </div>
 

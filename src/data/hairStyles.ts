@@ -20,8 +20,6 @@ export const categoryOptions = [
   { id: 'color' as Category, label: '염색 스타일', emoji: '🎨', description: '염색 컬러를 선택하세요' },
 ];
 
-const MALE_PERSONA = `This is a high-resolution professional studio photo of a young and stylish Korean male hair model. She has clean and shiny 'glass skin' and subtle and natural makeup. With a soft body, it flows gracefully in and out of the ear. He doesn't stare directly into the camera with a calm and cool expression. The lighting is soft and diffuse. She took this picture at eye level with a subtle bokeh effect.`;
-
 const maleCuts: HairStyle[] = [
   '투블럭컷', '댄디컷', '리프컷', '크롭컷', '아이비리그컷',
   '리젠트컷', '포마드컷', '슬릭백컷', '울프컷', '모히칸컷',
@@ -31,10 +29,8 @@ const maleCuts: HairStyle[] = [
   name,
   gender: 'male',
   category: 'cut',
-  prompt: `${MALE_PERSONA} He has a ${name} hairstyle, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography, SNS Instagram style`,
+  prompt: `A professional Korean male hair model with a ${name} hairstyle, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography, SNS Instagram style`,
 }));
-
-const FEMALE_PERSONA = `Confession of a young and sophisticated Korean woman. She is putting on subtle and natural makeup with bright and dewy "glass skin" and coral pink lips. She does not look directly into the camera with a slightly chic expression. She is wearing sensual and sophisticated outfits. Shooting at eye level with subtle bokeh effect.`;
 
 const femaleCuts: HairStyle[] = [
   '레이어드컷', '허쉬컷', '보브컷', '태슬컷', '프렌치보브',
@@ -45,7 +41,7 @@ const femaleCuts: HairStyle[] = [
   name,
   gender: 'female',
   category: 'cut',
-  prompt: `${FEMALE_PERSONA} She has a ${name} hairstyle, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography, SNS Instagram style`,
+  prompt: `A professional Korean female hair model with a ${name} hairstyle, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography, SNS Instagram style`,
 }));
 
 const malePerms: HairStyle[] = [
@@ -57,7 +53,7 @@ const malePerms: HairStyle[] = [
   name,
   gender: 'male',
   category: 'perm',
-  prompt: `${MALE_PERSONA} He has a ${name} perm hairstyle, natural texture, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
+  prompt: `A professional Korean male hair model with a ${name} perm hairstyle, natural texture, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
 }));
 
 const femalePerms: HairStyle[] = [
@@ -69,7 +65,7 @@ const femalePerms: HairStyle[] = [
   name,
   gender: 'female',
   category: 'perm',
-  prompt: `${FEMALE_PERSONA} She has a ${name} perm hairstyle, elegant texture, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
+  prompt: `A professional Korean female hair model with a ${name} perm hairstyle, elegant texture, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
 }));
 
 const maleColors: HairStyle[] = [
@@ -80,7 +76,7 @@ const maleColors: HairStyle[] = [
   name,
   gender: 'male',
   category: 'color',
-  prompt: `${MALE_PERSONA} He has ${name} hair color, beautiful color tones, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
+  prompt: `A professional Korean male hair model with ${name} hair color, beautiful color tones, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
 }));
 
 const femaleColors: HairStyle[] = [
@@ -93,7 +89,7 @@ const femaleColors: HairStyle[] = [
   name,
   gender: 'female',
   category: 'color',
-  prompt: `${FEMALE_PERSONA} She has ${name} hair color, beautiful color tones, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
+  prompt: `A professional Korean female hair model with ${name} hair color, beautiful color tones, natural warm lighting, front view, cozy stylish cafe background, high quality portrait photography`,
 }));
 
 export const allStyles: HairStyle[] = [

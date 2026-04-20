@@ -1,4 +1,4 @@
-// Hair image generation using CometAPI Midjourney API (/mj/submit/imagine + polling)
+// Hair image generation using Lovable AI Gateway
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -7,121 +7,108 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const MJ_BASE = "https://api.cometapi.com";
-
 function getSeasonalClothing(isMale: boolean): string {
   const month = new Date().getMonth() + 1;
-  // 뮤트톤 단색 의상, 헤어가 돋보이도록 심플하게
-  // 남성: 레퍼런스 이미지 기반 의상 (블랙 티, 그레이 맨투맨, 브라운 롱슬리브, 블랙 집업, 아이보리 셔츠, 블랙 니트, 토프 니트)
-  const maleClothing = [
-    "black simple crew-neck t-shirt",
-    "charcoal gray oversized sweatshirt",
-    "dark brown long-sleeve crew-neck shirt",
-    "black zip-up jacket over white crew-neck tee",
-    "ivory cotton button-down shirt with collar",
-    "black fine-knit crew-neck sweater",
-    "warm taupe crew-neck knit sweater",
-    "oatmeal minimal crew-neck t-shirt",
-    "muted brown relaxed-fit long-sleeve top",
-    "dark navy simple crew-neck sweater",
-  ];
-
-  // 여성: 뮤트톤 단색 의상
-  const mutedColors = pickRandom(["ivory", "cream", "beige", "oatmeal", "light gray", "olive", "dusty pink", "muted brown", "warm taupe", "soft khaki"]);
-
   if (isMale) {
-    if (month >= 3 && month <= 5) return pickRandom(maleClothing);
-    if (month >= 6 && month <= 8) return pickRandom(["black simple crew-neck t-shirt", "charcoal gray crew-neck t-shirt", "oatmeal minimal crew-neck t-shirt", "white basic round-neck tee"]);
-    if (month >= 9 && month <= 11) return pickRandom(maleClothing);
-    return pickRandom(["black fine-knit crew-neck sweater", "warm taupe crew-neck knit sweater", "charcoal gray oversized sweatshirt", "dark brown long-sleeve crew-neck shirt", "black zip-up jacket over white crew-neck tee"]);
+    if (month >= 3 && month <= 5) return pickRandom(["light linen shirt", "thin cotton sweater over a collared shirt", "casual spring jacket with a t-shirt", "knit polo shirt", "denim jacket over a henley"]);
+    if (month >= 6 && month <= 8) return pickRandom(["crisp white short-sleeve shirt", "breathable linen camp collar shirt", "casual cotton polo", "lightweight henley t-shirt", "relaxed fit crew neck tee"]);
+    if (month >= 9 && month <= 11) return pickRandom(["wool crew-neck sweater", "layered flannel shirt", "corduroy jacket over a turtleneck", "knit cardigan over a shirt", "suede bomber jacket with a t-shirt"]);
+    return pickRandom(["chunky knit turtleneck sweater", "wool overcoat over a button-up shirt", "cashmere crew-neck sweater", "padded vest over a hoodie", "heavy knit cable sweater"]);
+  } else {
+    if (month >= 3 && month <= 5) return pickRandom(["floral blouse", "light cardigan over a camisole", "pastel knit top", "denim jacket over a spring dress", "cotton wrap blouse"]);
+    if (month >= 6 && month <= 8) return pickRandom(["off-shoulder blouse", "lightweight linen top", "airy cotton camisole with a light cardigan", "sleeveless knit top", "breezy floral top"]);
+    if (month >= 9 && month <= 11) return pickRandom(["cozy knit sweater", "trench coat over a blouse", "turtleneck with a blazer", "chunky cardigan", "suede jacket over a fitted top"]);
+    return pickRandom(["cashmere turtleneck", "wool coat over a knit dress", "faux fur collar coat over a blouse", "thick cable-knit sweater", "padded jacket with a scarf"]);
   }
-  if (month >= 3 && month <= 5) return pickRandom([`${mutedColors} simple mock-neck knit top`, `${mutedColors} minimal ribbed long-sleeve top`, `${mutedColors} clean turtleneck top`, `${mutedColors} soft off-shoulder knit top`]);
-  if (month >= 6 && month <= 8) return pickRandom([`${mutedColors} sleeveless mock-neck top`, `${mutedColors} minimal off-shoulder top`, `${mutedColors} simple cold-shoulder knit top`, `${mutedColors} clean ribbed sleeveless top`]);
-  if (month >= 9 && month <= 11) return pickRandom([`${mutedColors} simple turtleneck sweater`, `${mutedColors} off-shoulder chunky knit`, `${mutedColors} minimal crew-neck sweater`, `${mutedColors} soft mock-neck knit`]);
-  return pickRandom([`${mutedColors} chunky off-shoulder knit sweater`, `${mutedColors} thick turtleneck sweater`, `${mutedColors} cable-knit off-shoulder top`, `${mutedColors} cashmere turtleneck`]);
 }
+
+const modelTraits = {
+  male: {
+    ages: ["early 20s", "mid 20s", "late 20s"],
+    faces: ["round face shape", "oval face shape", "square jawline", "angular face with high cheekbones", "soft diamond-shaped face"],
+    skins: ["fair skin", "light tan skin", "warm medium skin tone", "slightly tanned skin"],
+    builds: ["slim build", "average build", "athletic muscular build", "broad-shouldered build"],
+    vibes: ["calm relaxed expression", "confident sharp gaze", "friendly warm smile", "serious editorial expression", "playful youthful look"],
+  },
+  female: {
+    ages: ["early 20s", "mid 20s", "late 20s"],
+    faces: ["round soft face", "oval face shape", "heart-shaped face", "V-line jawline", "small delicate face with high cheekbones"],
+    skins: ["porcelain fair skin", "light natural skin", "warm honey skin tone", "slightly tanned glowing skin"],
+    builds: ["slim petite build", "average build", "tall slender build"],
+    vibes: ["elegant poised expression", "cute bright smile", "chic cool gaze", "natural effortless look", "dreamy soft expression"],
+  },
+};
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function buildMjPrompt(basePrompt: string, bgPrompt?: string): string {
-  const lowerPrompt = basePrompt.toLowerCase();
+function cleanBasePrompt(prompt: string): string {
+  return prompt
+    .replace(/studio lighting/gi, "natural warm lighting")
+    .replace(/bright sheer curtain background/gi, "")
+    .replace(/clean background/gi, "");
+}
+
+function buildVarietyPrompt(basePrompt: string, bgPrompt?: string): string {
+
+const backgroundDesc = bgPrompt || "cozy stylish cafe atmosphere with warm ambient lighting";
+  const cleaned = cleanBasePrompt(basePrompt);
+  const lowerPrompt = cleaned.toLowerCase();
   const isFemale = lowerPrompt.includes("female") || lowerPrompt.includes("woman") || lowerPrompt.includes("여성");
   const isMale = !isFemale;
+  const traits = isMale ? modelTraits.male : modelTraits.female;
+  const age = pickRandom(traits.ages);
+  const face = pickRandom(traits.faces);
+  const skin = pickRandom(traits.skins);
+  const build = pickRandom(traits.builds);
+  const vibe = pickRandom(traits.vibes);
+  const uniqueId = Math.random().toString(36).substring(2, 8);
   const clothing = getSeasonalClothing(isMale);
 
-  if (isFemale) {
-    const backgroundDesc = bgPrompt || "a plain light gray concrete wall, slightly textured";
-    return `${basePrompt}. A candid photo taken with a Canon EOS R5, 85mm f/1.4 lens, of a real young Korean woman at a hair salon. Shot looks like it was taken by a hairstylist to showcase the haircut. She has minimal no-makeup makeup, natural dewy skin with visible pores and slight skin texture, coral tinted lip balm. Her expression is calm and slightly shy, not posing - just standing naturally as if the stylist said "let me take a quick photo." She wears a ${clothing}. Background is ${backgroundDesc}. Natural window light from the side, no studio lighting, no retouching. Slight lens imperfections, natural color grading like an iPhone photo. The hairstyle is the focal point. Upper body from chest up. No hands near head or hair. NOT AI generated, NOT illustration, NOT 3D render, NOT perfect skin --ar 4:5 --v 6.1 --style raw --q 2 --s 50`;
-  }
+  const isWestern = lowerPrompt.includes("western") || lowerPrompt.includes("caucasian") || lowerPrompt.includes("foreign");
+  const ethnicityDesc = isWestern ? "Western Caucasian" : "Korean";
 
-  // 남성 - 레퍼런스 이미지 기반: 자연스러운 피부, 약간의 잡티, 무표정~살짝 미소, 다양한 시선 방향
-  const backgroundDesc = bgPrompt || "a plain matte white wall, clean and minimal";
-  const maleGaze = pickRandom(["looking slightly to the left", "looking slightly to the right", "gazing slightly downward to the side", "looking past the camera with a calm expression"]);
-  const maleExpression = pickRandom(["calm neutral expression with lips gently closed", "subtle gentle half-smile", "relaxed soft expression", "calm and slightly shy expression"]);
-  return `${basePrompt}. A candid photo taken with a Canon EOS R5, 85mm f/1.4 lens, of a real young Korean man in his early 20s at a hair salon. Shot looks like it was taken by a hairstylist to showcase the haircut. He has clean natural skin with visible pores, slight blemishes, and natural skin texture - NOT airbrushed, NOT flawless. ${maleExpression}, ${maleGaze} - NOT staring directly at camera. He wears a ${clothing}. Background is ${backgroundDesc}. Natural soft daylight, no studio lighting, no retouching. Slight lens imperfections, natural color grading like an iPhone photo. The hairstyle is the focal point. Upper body from chest up. No hands near head or hair. NOT AI generated, NOT illustration, NOT 3D render, NOT perfect porcelain skin --ar 4:5 --v 6.1 --style raw --q 2 --s 50`;
+  return `${cleaned}. IMPORTANT: Generate a UNIQUE and DISTINCTIVE person, NOT a generic model. The model is a ${ethnicityDesc} ${isMale ? "man" : "woman"} in their ${age}, with a ${face}, ${skin}, ${build}, and a ${vibe}. The person MUST be wearing a ${clothing}. NEVER generate a bare-shouldered or unclothed model. The background should be ${backgroundDesc}. FRAMING: Upper body close-up shot (chest and above), tightly framed to clearly showcase the hairstyle in detail. The hairstyle must be the focal point of the image. The pose should be natural and candid like an SNS Instagram photo, not stiff or overly posed. The outfit should be trendy and fashionable, looking stylish and well-coordinated. This person has unique individual features that make them look like a real specific person (model ID: ${uniqueId}). Do NOT reuse the same face from previous generations.`;
 }
 
-// Poll MJ task until SUCCESS or failure
-async function pollTask(taskId: string, apiKey: string, maxWaitMs = 120000): Promise<{ imageUrl: string; buttons: any[] }> {
-  const startTime = Date.now();
-  const pollInterval = 3000; // 3 seconds
-
-  while (Date.now() - startTime < maxWaitMs) {
-    const resp = await fetch(`${MJ_BASE}/mj/task/${taskId}/fetch`, {
-      headers: { "Authorization": `Bearer ${apiKey}` },
-    });
-
-    if (!resp.ok) {
-      const body = await resp.text();
-      console.error(`Poll error [${resp.status}]:`, body);
-      throw new Error(`폴링 실패: ${resp.status}`);
-    }
-
-    const task = await resp.json();
-    console.log(`Task ${taskId} status: ${task.status}, progress: ${task.progress || "N/A"}`);
-
-    if (task.status === "SUCCESS") {
-      return { imageUrl: task.imageUrl, buttons: task.buttons || [] };
-    }
-    if (task.status === "FAILURE" || task.status === "CANCEL") {
-      throw new Error(task.failReason || "이미지 생성에 실패했어요.");
-    }
-
-    // Wait before next poll
-    await new Promise((r) => setTimeout(r, pollInterval));
+function extractImageUrl(choice: any): string | null {
+  if (choice?.images?.[0]?.image_url?.url) return choice.images[0].image_url.url;
+  if (!choice?.content) return null;
+  if (Array.isArray(choice.content)) {
+    const imgPart = choice.content.find((p: any) => p.type === "image_url" || p.type === "image");
+    if (imgPart?.image_url?.url) return imgPart.image_url.url;
+    if (imgPart?.url) return imgPart.url;
+    return null;
   }
-
-  throw new Error("이미지 생성 시간이 초과되었어요. 다시 시도해 주세요.");
+  if (typeof choice.content !== "string") return null;
+  const content = choice.content;
+  if (content.startsWith("data:image")) return content;
+  const dataIdx = content.indexOf("data:image/");
+  if (dataIdx !== -1) {
+    const closeParen = content.indexOf(")", dataIdx);
+    return closeParen !== -1 ? content.substring(dataIdx, closeParen) : content.substring(dataIdx).trim();
+  }
+  const urlMatch = content.match(/(https?:\/\/[^\s)]+\.(png|jpg|jpeg|webp)[^\s)]*)/i);
+  return urlMatch ? urlMatch[1] : null;
 }
 
-// Download image from URL and upload to Supabase Storage
-async function downloadAndUpload(supabase: any, imageUrl: string, timestamp: number, index: number): Promise<string> {
-  try {
-    const imgResp = await fetch(imageUrl);
-    if (!imgResp.ok) throw new Error(`Image download failed: ${imgResp.status}`);
-    const imgBuffer = new Uint8Array(await imgResp.arrayBuffer());
-    const contentType = imgResp.headers.get("content-type") || "image/png";
-    const ext = contentType.includes("jpeg") || contentType.includes("jpg") ? "jpg" : "png";
+async function uploadToStorage(supabase: any, imageDataUrl: string, timestamp: number, index: number): Promise<string> {
+  const base64Match = imageDataUrl.match(/^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/);
+  if (base64Match) {
+    const ext = base64Match[1] === "jpeg" ? "jpg" : base64Match[1];
+    const binaryData = Uint8Array.from(atob(base64Match[2]), c => c.charCodeAt(0));
     const filePath = `generated/${timestamp}_${index}.${ext}`;
-
-    const { error } = await supabase.storage.from("hair-images").upload(filePath, imgBuffer, {
-      contentType,
+    const { error } = await supabase.storage.from("hair-images").upload(filePath, binaryData, {
+      contentType: `image/${base64Match[1]}`,
       upsert: true,
     });
-
-    if (error) {
-      console.error("Storage upload error:", error);
-      return imageUrl; // fallback to original URL
+    if (!error) {
+      const { data: urlData } = supabase.storage.from("hair-images").getPublicUrl(filePath);
+      return urlData.publicUrl;
     }
-
-    const { data: urlData } = supabase.storage.from("hair-images").getPublicUrl(filePath);
-    return urlData.publicUrl;
-  } catch (e) {
-    console.error("downloadAndUpload error:", e);
-    return imageUrl;
   }
+  return imageDataUrl;
 }
 
 serve(async (req) => {
@@ -130,8 +117,8 @@ serve(async (req) => {
   try {
     const { prompt, count = 1, referenceImage, copyrightText, backgroundPrompt } = await req.json();
 
-    const COMET_API_KEY = Deno.env.get("COMET_API_KEY");
-    if (!COMET_API_KEY) throw new Error("COMET_API_KEY is not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -141,101 +128,119 @@ serve(async (req) => {
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(JSON.stringify({ error: "prompt is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const images: string[] = [];
     const timestamp = Date.now();
-    const mjPrompt = buildMjPrompt(prompt, backgroundPrompt);
 
-    console.log("MJ Prompt:", mjPrompt.slice(0, 200));
+    const angleDescriptions = [
+      "front view upper body close-up portrait, chest and above, clearly showing the hairstyle",
+      "45 degree angle side view upper body close-up, chest and above, clearly showing the hairstyle from an angle",
+      "complete side profile upper body close-up, chest and above, clearly showing the hairstyle silhouette",
+      "back view upper body close-up showing full hairstyle from behind, head and shoulders",
+    ];
 
-    // Step 1: Submit imagine task
-    const submitBody: any = { prompt: mjPrompt };
+    let currentReference = referenceImage || null;
+    const copyrightInstruction = copyrightText
+      ? ` Add a small, elegant copyright watermark text "${copyrightText}" at the bottom center of the image in a semi-transparent white font, like a professional photo watermark.`
+      : '';
 
-    // If reference image provided, use it as base64 array
-    if (referenceImage) {
-      submitBody.base64Array = [];
-      if (referenceImage.startsWith("data:image")) {
-        submitBody.base64Array.push(referenceImage);
-      } else if (referenceImage.startsWith("http")) {
-        // MJ API can accept base64 — fetch and convert
+    for (let i = 0; i < Math.min(count, 4); i++) {
+      let messages: any[];
+
+      if (currentReference) {
+        messages = [
+          {
+            role: "user",
+            content: [
+              { type: "image_url", image_url: { url: currentReference } },
+              {
+                type: "text",
+                text: `This is a reference photo of a hair model. Generate the EXACT SAME person with the EXACT SAME hairstyle, hair color, face, and clothing, but now shown from a ${angleDescriptions[i]}. IMPORTANT: Frame as an upper body close-up (chest and above) to clearly showcase the hairstyle. The hairstyle must be the focal point. The person MUST be wearing appropriate clothing at all times. Keep the same background atmosphere. The pose should be natural and candid like an SNS photo. The person must look identical - same face shape, skin tone, hair texture, and style. Only the camera angle changes.${copyrightInstruction}`,
+              },
+            ],
+          },
+        ];
+      } else {
+        const bgDesc = backgroundPrompt || "cozy stylish cafe atmosphere with warm ambient lighting";
+        const variedPrompt = buildVarietyPrompt(prompt, backgroundPrompt);
+        messages = [
+          {
+            role: "user",
+            content: `Generate a photorealistic hair model image: ${variedPrompt}. FRAMING: Upper body close-up (chest and above), tightly framed to clearly showcase the hairstyle. The image should look like a stylish SNS Instagram photo with ${bgDesc}. The pose should be natural and candid, not stiff. The outfit should be trendy and well-coordinated.${copyrightInstruction}`,
+          },
+        ];
+      }
+
+      let imageDataUrl: string | null = null;
+      const maxRetries = 3;
+
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
-          const imgResp = await fetch(referenceImage);
-          const imgBuf = await imgResp.arrayBuffer();
-          const imgBase64 = btoa(String.fromCharCode(...new Uint8Array(imgBuf)));
-          const contentType = imgResp.headers.get("content-type") || "image/png";
-          submitBody.base64Array.push(`data:${contentType};base64,${imgBase64}`);
-        } catch (e) {
-          console.error("Failed to fetch reference image:", e);
+          const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ model: "google/gemini-2.5-flash-image", modalities: ["image", "text"], messages }),
+          });
+
+          if (!response.ok) {
+            const status = response.status;
+            const body = await response.text();
+            console.error(`AI Gateway error (attempt ${attempt + 1}):`, status, body);
+            if (status === 429) {
+              return new Response(JSON.stringify({ error: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요." }), {
+                status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+              });
+            }
+            if (attempt < maxRetries - 1) continue;
+            return new Response(JSON.stringify({ error: "이미지 생성에 실패했습니다." }), {
+              status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+
+          const data = await response.json();
+          imageDataUrl = extractImageUrl(data.choices?.[0]?.message);
+
+          if (imageDataUrl) break;
+          console.error(`No image extracted (attempt ${attempt + 1}):`, JSON.stringify(data).slice(0, 500));
+        } catch (fetchErr) {
+          console.error(`Fetch error (attempt ${attempt + 1}):`, fetchErr);
+          if (attempt >= maxRetries - 1) break;
         }
       }
-    }
 
-    const submitResp = await fetch(`${MJ_BASE}/mj/submit/imagine`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${COMET_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(submitBody),
-    });
-
-    if (!submitResp.ok) {
-      const errBody = await submitResp.text();
-      console.error(`MJ submit error [${submitResp.status}]:`, errBody);
-      if (submitResp.status === 429) {
-        return new Response(JSON.stringify({ error: "요청이 너무 많아요. 잠시 후 다시 시도해 주세요." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+      if (imageDataUrl) {
+        if (!currentReference) currentReference = imageDataUrl;
+        try {
+          const finalUrl = await uploadToStorage(supabase, imageDataUrl, timestamp, i);
+          images.push(finalUrl);
+        } catch (uploadErr) {
+          console.error("Storage upload failed:", uploadErr);
+          images.push(imageDataUrl);
+        }
+      } else {
+        console.error("Failed to extract image after all retries for angle", i);
       }
-      return new Response(JSON.stringify({ error: "이미지 생성 요청에 실패했어요." }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const submitData = await submitResp.json();
-    console.log("Submit response:", JSON.stringify(submitData));
-
-    if (!submitData.result) {
-      return new Response(JSON.stringify({ error: submitData.description || "이미지 생성 요청에 실패했어요." }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const taskId = submitData.result;
-
-    // Step 2: Poll until SUCCESS
-    const taskResult = await pollTask(taskId, COMET_API_KEY);
-    console.log("Task completed, imageUrl:", taskResult.imageUrl?.slice(0, 100));
-
-    // Step 3: Download and upload to storage
-    if (taskResult.imageUrl) {
-      const finalUrl = await downloadAndUpload(supabase, taskResult.imageUrl, timestamp, 0);
-      images.push(finalUrl);
     }
 
     if (images.length === 0) {
-      return new Response(JSON.stringify({ error: "이미지를 생성할 수 없어요." }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      return new Response(JSON.stringify({ error: "이미지를 생성할 수 없습니다." }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(JSON.stringify({ images, taskId, buttons: taskResult.buttons }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    return new Response(JSON.stringify({ images }), {
+      status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("generate-hair-image error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "알 수 없는 오류가 발생했어요." }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
