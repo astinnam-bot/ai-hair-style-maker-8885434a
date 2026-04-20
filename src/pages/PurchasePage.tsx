@@ -1,115 +1,44 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { allStyles } from '@/data/hairStyles';
-import { Check, Sparkles, Loader2, Download, Ticket } from 'lucide-react';
+import { Sparkles, Loader2, Download } from 'lucide-react';
 import { downloadImage } from '@/lib/downloadImage';
-
-import { generateHairImage } from '@/lib/generateImage';
 import { useToast } from '@/hooks/use-toast';
 import { useTicket } from '@/contexts/TicketContext';
-import { supabase } from '@/integrations/supabase/client';
 import TicketBanner from '@/components/TicketBanner';
-
-
-const shotLabels = [
-  { label: '정면 기본 컷', description: '얼굴 정면에서 본 스타일' },
-  { label: '45도 측면 컷', description: '비스듬한 각도에서 본 스타일' },
-  { label: '완전 측면', description: '옆모습에서 본 헤어라인' },
-  { label: '후면 롱샷', description: '뒷모습에서 본 전체 스타일' },
-];
-
-const allShotLabels = [
-  ...shotLabels,
-  { label: '4컷 병합 이미지', description: '4가지 각도를 한 장에 담은 이미지' },
-];
-
-async function createMergedImage(images: string[]): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const imgElements: HTMLImageElement[] = [];
-    let loaded = 0;
-    images.forEach((src, i) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        loaded++;
-        if (loaded === images.length) {
-          const cellW = imgElements[0].naturalWidth;
-          const cellH = imgElements[0].naturalHeight;
-          const canvas = document.createElement('canvas');
-          canvas.width = cellW * 2;
-          canvas.height = cellH * 2;
-          const ctx = canvas.getContext('2d')!;
-          imgElements.forEach((el, idx) => {
-            const col = idx % 2;
-            const row = Math.floor(idx / 2);
-            ctx.drawImage(el, col * cellW, row * cellH, cellW, cellH);
-          });
-          resolve(canvas.toDataURL('image/jpeg', 0.92));
-        }
-      };
-      img.onerror = reject;
-      imgElements[i] = img;
-      img.src = src;
-    });
-  });
-}
 
 const PurchasePage = () => {
   const navigate = useNavigate();
   const { styleId } = useParams<{ styleId: string }>();
   const location = useLocation();
   const previewImage = (location.state as any)?.previewImage as string | undefined;
-  const backgroundPrompt = (location.state as any)?.backgroundPrompt as string | undefined;
   const style = allStyles.find(s => s.id === styleId);
 
   const { hasTicket, consumeTicket } = useTicket();
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
-  const [affiliation, setAffiliation] = useState('');
-  const [initials, setInitials] = useState('');
+  const [isUnlocking, setIsUnlocking] = useState(false);
+  const [unlockedImage, setUnlockedImage] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const currentYear = new Date().getFullYear();
-  const copyrightText = affiliation || initials
-    ? `© ${currentYear}${affiliation ? ` ${affiliation}` : ''}${initials ? ` ${initials}` : ''}. All Rights Reserved.`
-    : '';
+  const isCompleted = !!unlockedImage;
 
-  const isCompleted = generatedImages.length > 0;
-
-
-
-
-  // 상세 이미지 생성 (뽑기권 소모)
-  const handleGenerate = async () => {
-    if (!hasTicket) return;
-    setIsGenerating(true);
+  // 워터마크 제거 후 다운로드 (뽑기권 1장 소모)
+  const handleUnlock = async () => {
+    if (!hasTicket || !previewImage) return;
+    setIsUnlocking(true);
     try {
-      const images = await generateHairImage(
-        style!.prompt,
-        4,
-        previewImage,
-        copyrightText || undefined,
-        backgroundPrompt,
-      );
-
-      let mergedUrl = '';
-      try {
-        mergedUrl = await createMergedImage(images);
-      } catch (e) {
-        console.error('Merge failed', e);
-      }
-      setGeneratedImages(mergedUrl ? [...images, mergedUrl] : images);
-
+      // 미리보기 이미지의 워터마크를 제거한 고화질 버전을 그대로 사용
+      setUnlockedImage(previewImage);
       consumeTicket();
-      toast({ title: '🎉 이미지 생성 완료!', description: '상세 5장이 준비되었어요.' });
+      await downloadImage(previewImage, `${style!.name}.jpg`);
+      toast({ title: '🎉 다운로드 시작', description: '워터마크 없는 이미지가 저장되었어요.' });
     } catch (err: any) {
       toast({
-        title: '이미지 생성 실패',
-        description: err.message || '잠시 후 다시 시도해 주세요. 뽑기권은 차감되지 않았어요.',
+        title: '다운로드 실패',
+        description: err.message || '잠시 후 다시 시도해 주세요.',
         variant: 'destructive',
       });
     } finally {
-      setIsGenerating(false);
+      setIsUnlocking(false);
     }
   };
 
@@ -123,10 +52,9 @@ const PurchasePage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-       {/* Header */}
-       <header className="px-5 pt-8 pb-4 relative z-10">
+      <header className="px-5 pt-8 pb-4 relative z-10">
         <h1 className="text-[24px] font-bold text-foreground">
-          {isCompleted ? '생성 완료 🎉' : isGenerating ? '이미지 생성 중...' : '상세 컷 뽑기'}
+          {isCompleted ? '다운로드 완료 🎉' : isUnlocking ? '워터마크 제거 중...' : '워터마크 제거 다운로드'}
         </h1>
         <p className="text-muted-foreground text-[14px] mt-1">
           {style.name} · {style.gender === 'male' ? '남성' : '여성'}
@@ -134,188 +62,67 @@ const PurchasePage = () => {
       </header>
 
       <main className="flex-1 px-5 pb-10">
-        {/* 생성 중 */}
-        {isGenerating ? (
-          <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
-            <Loader2 className="w-12 h-12 animate-spin text-primary mb-4" />
-            <p className="text-[16px] font-bold text-foreground mb-2">이미지 생성 중...</p>
-            <p className="text-[14px] text-muted-foreground text-center">
-              고화질 상세 5장을 생성하고 있어요.<br />잠시만 기다려 주세요.
-            </p>
-          </div>
-        ) : isCompleted ? (
-          /* 생성 완료 */
+        {isCompleted && unlockedImage ? (
           <div className="animate-slide-up">
-            {generatedImages[4] && (
-              <div className="mb-5 animate-fade-in">
-                <div
-                  className="w-full aspect-square rounded-2xl overflow-hidden mb-2 cursor-pointer active:scale-[0.98] transition-transform relative"
-                  onClick={() => downloadImage(generatedImages[4], `${style.name}_4컷_병합.jpg`)}
-                >
-                  <img src={generatedImages[4]} alt="병합 이미지" className="w-full h-full object-cover rounded-2xl" />
-                  <div className="absolute inset-0 flex items-end justify-center pb-3 bg-gradient-to-t from-black/30 to-transparent rounded-2xl opacity-0 hover:opacity-100 transition-opacity">
-                    <span className="text-white text-[12px] font-semibold flex items-center gap-1"><Download className="w-3.5 h-3.5" /> 탭하여 저장</span>
-                  </div>
-                </div>
-                <p className="text-[13px] font-semibold text-foreground">4컷 병합 이미지</p>
-                <p className="text-[11px] text-muted-foreground">정면 · 45도 · 측면 · 후면 한눈에 보기</p>
-              </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-3 mb-5">
-              {shotLabels.map((shot, i) => (
-                <div key={i} className="animate-fade-in" style={{ animationDelay: `${(i + 1) * 150}ms`, animationFillMode: 'backwards' }}>
-                  <div
-                    className="w-full aspect-[3/4] rounded-2xl relative overflow-hidden mb-2 cursor-pointer active:scale-[0.98] transition-transform"
-                    onClick={() => generatedImages[i] && downloadImage(generatedImages[i], `${style.name}_${shot.label}.jpg`)}
-                  >
-                    {generatedImages[i] ? (
-                      <>
-                        <img src={generatedImages[i]} alt={shot.label} className="w-full h-full object-cover rounded-2xl" />
-                        <div className="absolute inset-0 flex items-end justify-center pb-3 bg-gradient-to-t from-black/30 to-transparent rounded-2xl opacity-0 hover:opacity-100 transition-opacity">
-                          <span className="text-white text-[12px] font-semibold flex items-center gap-1"><Download className="w-3.5 h-3.5" /> 탭하여 저장</span>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="w-full h-full bg-secondary rounded-2xl flex items-center justify-center">
-                        <Sparkles className="w-8 h-8 text-muted-foreground opacity-40" />
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-[13px] font-semibold text-foreground">{shot.label}</p>
-                  <p className="text-[11px] text-muted-foreground">{shot.description}</p>
-                </div>
-              ))}
+            <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden mb-5">
+              <img src={unlockedImage} alt={style.name} className="w-full h-full object-cover rounded-2xl" />
             </div>
-
             <button
-              onClick={async () => {
-                try {
-                  toast({ title: "ZIP 생성 중...", description: "서버에서 이미지를 압축하고 있어요." });
-                  const labels = [...shotLabels.map(s => s.label), '4컷_병합'];
-                  const { data, error } = await supabase.functions.invoke('create-zip', {
-                    body: {
-                      imageUrls: generatedImages,
-                      styleName: style.name,
-                      labels: generatedImages.map((_, i) => labels[i] || `image_${i}`),
-                    },
-                  });
-                  if (error || data?.error) throw new Error(data?.error || error?.message || 'ZIP 생성 실패');
-                  window.open(data.zipUrl, '_blank');
-                } catch (e: any) {
-                  toast({ title: "다운로드 실패", description: e?.message || "잠시 후 다시 시도해 주세요.", variant: "destructive" });
-                }
-              }}
+              onClick={() => downloadImage(unlockedImage, `${style.name}.jpg`)}
               className="w-full mb-4 bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
             >
               <Download className="w-5 h-5" />
-              전체 이미지 다운로드 *.zip
+              다시 다운로드
             </button>
-
-            <div className="bg-secondary rounded-2xl p-4">
-              <p className="text-[13px] text-foreground font-semibold mb-1">✅ 이미지가 생성되었어요</p>
+            <div className="bg-secondary rounded-2xl p-4 mb-4">
+              <p className="text-[13px] text-foreground font-semibold mb-1">✅ 이미지가 저장되었어요</p>
               <p className="text-[12px] text-muted-foreground">
-                {style.name} 스타일의 상세 5장이 생성되었어요.
-                고화질 워터마크 없는 이미지를 확인해 보세요.
+                저장이 안 된다면 이미지를 길게 눌러 저장해 주세요.
               </p>
             </div>
-
-            {copyrightText && (
-              <div className="mt-4 text-center">
-                <p className="text-[12px] text-muted-foreground">{copyrightText}</p>
-              </div>
-            )}
-
             <button
               onClick={() => navigate('/')}
-              className="w-full mt-4 bg-secondary text-foreground rounded-2xl py-4 text-[15px] font-bold transition-all duration-200 active:scale-[0.98]"
+              className="w-full bg-secondary text-foreground rounded-2xl py-4 text-[15px] font-bold transition-all duration-200 active:scale-[0.98]"
             >
               다른 스타일 보기
             </button>
           </div>
         ) : (
-          /* 구매 전 / 뽑기권 보유 */
           <div className="animate-fade-in">
-            {/* 안내 */}
             <div className="bg-primary/10 rounded-2xl p-5 mb-5">
               <p className="text-[15px] font-bold text-foreground leading-relaxed">
-                🎫 뽑기권 1장을 사용하면 마음에 쏙 드는<br />
-                상세 5장의 사진을 생성할 수 있어요!
+                🎫 뽑기권 1장으로 워터마크를 제거하고<br />
+                고화질 이미지 1장을 바로 다운로드할 수 있어요!
               </p>
             </div>
 
-            {/* 미리보기 이미지 */}
             {previewImage && (
-              <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden mb-5 watermark">
-                <img src={previewImage} alt="미리보기" className="w-full h-full object-cover rounded-2xl" />
-                <p className="text-[12px] text-muted-foreground mt-2 text-center">이 모델의 상세 4컷이 생성돼요</p>
+              <div className="mb-5">
+                <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden watermark">
+                  <img src={previewImage} alt="미리보기" className="w-full h-full object-cover rounded-2xl" />
+                </div>
+                <p className="text-[12px] text-muted-foreground mt-2 text-center">
+                  현재 미리보기 이미지의 워터마크가 제거돼요
+                </p>
               </div>
             )}
 
-            {/* 포함 이미지 목록 */}
-            <div className="bg-card rounded-2xl border border-border p-5 mb-5">
-              <p className="text-[15px] font-bold text-foreground mb-4">포함된 이미지 5장</p>
-              <div className="flex flex-col gap-3">
-                {allShotLabels.map((shot, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-3 h-3 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-[14px] font-semibold text-foreground">{shot.label}</p>
-                      <p className="text-[12px] text-muted-foreground">{shot.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 저작권 정보 */}
-            <div className="bg-card rounded-2xl border border-border p-5 mb-5">
-              <p className="text-[15px] font-bold text-foreground mb-1">저작권 정보 <span className="text-muted-foreground font-normal text-[12px]">(선택사항)</span></p>
-              <p className="text-[12px] text-muted-foreground mb-4">입력하시면 이미지 하단에 저작권 문구가 표시돼요.</p>
-              <div className="flex flex-col gap-3">
-                <div>
-                  <label className="text-[13px] text-muted-foreground mb-1 block">소속</label>
-                  <input
-                    type="text"
-                    value={affiliation}
-                    onChange={(e) => setAffiliation(e.target.value.slice(0, 50))}
-                    placeholder="예: Juno Hair"
-                    className="w-full bg-secondary text-foreground rounded-xl px-4 py-3 text-[14px] placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="text-[13px] text-muted-foreground mb-1 block">이니셜 (지점명 등)</label>
-                  <input
-                    type="text"
-                    value={initials}
-                    onChange={(e) => setInitials(e.target.value.slice(0, 30))}
-                    placeholder="예: Sujin"
-                    className="w-full bg-secondary text-foreground rounded-xl px-4 py-3 text-[14px] placeholder:text-muted-foreground/50 outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-                  />
-                </div>
-                {copyrightText && (
-                  <div className="bg-secondary rounded-xl px-4 py-3">
-                    <p className="text-[12px] text-muted-foreground">미리보기:</p>
-                    <p className="text-[13px] text-foreground font-medium mt-1">{copyrightText}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* 뽑기권 구매 / 생성 */}
             <div className="mb-5">
               <TicketBanner />
             </div>
 
             <button
-              onClick={handleGenerate}
-              disabled={!hasTicket}
+              onClick={handleUnlock}
+              disabled={!hasTicket || isUnlocking || !previewImage}
               className="w-full bg-primary text-primary-foreground rounded-2xl py-4 text-[16px] font-bold transition-all duration-200 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              <Sparkles className="w-5 h-5" />
-              {hasTicket ? '상세 이미지 생성하기' : '🎫 뽑기권 구매 후 생성 가능'}
+              {isUnlocking ? (
+                <><Loader2 className="w-5 h-5 animate-spin" /> 처리 중...</>
+              ) : hasTicket ? (
+                <><Sparkles className="w-5 h-5" /> 워터마크제거 다운받기</>
+              ) : (
+                '🎫 뽑기권 구매 후 다운로드 가능'
+              )}
             </button>
           </div>
         )}
