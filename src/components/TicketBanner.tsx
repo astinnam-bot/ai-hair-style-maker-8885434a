@@ -100,8 +100,8 @@ const TicketBanner = () => {
                 {isRecovering
                   ? '⏳ 이전 결제 확인 중...'
                   : displayAmount
-                    ? `${displayAmount} · 상세 ${tp.ticketCount * 5}장 생성`
-                    : `상세 ${tp.ticketCount * 5}장 생성`}
+                    ? `${displayAmount} · 워터마크 제거 ${tp.ticketCount}장`
+                    : `워터마크 제거 ${tp.ticketCount}장`}
               </p>
             </div>
             <button
